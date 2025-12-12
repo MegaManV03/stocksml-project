@@ -1,0 +1,155 @@
+/* Account.css - Simple version */
+.account-page {
+  max-width: 600px;
+  margin: 2rem auto;
+  padding: 0 1rem;
+}
+
+.account-header {
+  margin-bottom: 2rem;
+}
+
+.account-header h1 {
+  margin: 0 0 0.5rem 0;
+  color: #333;
+}
+
+.account-header p {
+  color: #666;
+  margin: 0;
+}
+
+.account-section {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.account-section h2 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.user-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: #555;
+}
+
+/* Form styles */
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-weight: 500;
+  color: #444;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 1rem;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #4a90e2;
+}
+
+.password-form {
+  margin-top: 1rem;
+}
+
+/* Button styles */
+.btn {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: 4px;
+  font-size: 1rem;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.2s;
+}
+
+.primary-btn {
+  background: #007bff;
+  color: white;
+}
+
+.primary-btn:hover {
+  background: #0056b3;
+}
+
+.logout-btn {
+  background: #6c757d;
+  color: white;
+}
+
+.logout-btn:hover {
+  background: #545b62;
+}
+
+.delete-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.delete-btn:hover:not(:disabled) {
+  background: #c82333;
+}
+
+.delete-btn:disabled {
+  background: #e0e0e0;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* Danger section */
+.danger-section {
+  border-color: #dc3545;
+}
+
+.warning {
+  color: #721c24;
+  background: #f8d7da;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.delete-input {
+  border-color: #dc3545 !important;
+}
+
+/* Messages */
+.success {
+  color: #155724;
+  background: #d4edda;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.error {
+  color: #721c24;
+  background: #f8d7da;
+  padding: 0.8rem;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+}
+
+.loading {
+  text-align: center;
+  padding: 3rem;
+  color: #666;
+}

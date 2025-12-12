@@ -1,18 +1,28 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database import get_db
-from models import Analysis
+from models import Analysis, User
 import schemas
+from routers.auth import get_current_admin  # Add this import
 
 router = APIRouter()
 
+# GET all analyses - ADMIN ONLY
 @router.get("/", response_model=list[schemas.Analysis])
-async def list_analyses(db: Session = Depends(get_db)):
+async def list_analyses(
+    current_user: User = Depends(get_current_admin),  # Admin only
+    db: Session = Depends(get_db)
+):
     analyses = db.query(Analysis).all()
     return analyses
 
+# POST create analysis - ADMIN ONLY
 @router.post("/", response_model=schemas.Analysis, status_code=201)
-async def create_analysis(analysis: schemas.AnalysisCreate, db: Session = Depends(get_db)):
+async def create_analysis(
+    analysis: schemas.AnalysisCreate,
+    current_user: User = Depends(get_current_admin),  # Admin only
+    db: Session = Depends(get_db)
+):
     db_analysis = Analysis(
         company_id=analysis.company_id,
         date=analysis.date,
@@ -23,7 +33,7 @@ async def create_analysis(analysis: schemas.AnalysisCreate, db: Session = Depend
         volume=analysis.volume,
         predicted_high=analysis.predicted_high,
         predicted_low=analysis.predicted_low,
-        predicted_open=analysis.predicted_open,  # ← ADD THIS
+        predicted_open=analysis.predicted_open,
         predicted_close=analysis.predicted_close,
         signal=analysis.signal,
         confidence_score=analysis.confidence_score
@@ -33,15 +43,26 @@ async def create_analysis(analysis: schemas.AnalysisCreate, db: Session = Depend
     db.refresh(db_analysis)
     return db_analysis
 
+# GET single analysis - ADMIN ONLY
 @router.get("/{analysis_id}", response_model=schemas.Analysis)
-async def get_analysis(analysis_id: int, db: Session = Depends(get_db)):
+async def get_analysis(
+    analysis_id: int,
+    current_user: User = Depends(get_current_admin),  # Admin only
+    db: Session = Depends(get_db)
+):
     analysis = db.query(Analysis).filter(Analysis.id == analysis_id).first()
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
     return analysis
 
+# PUT update analysis - ADMIN ONLY
 @router.put("/{analysis_id}")
-async def update_analysis(analysis_id: int, analysis_data: schemas.AnalysisUpdate, db: Session = Depends(get_db)):
+async def update_analysis(
+    analysis_id: int,
+    analysis_data: schemas.AnalysisUpdate,
+    current_user: User = Depends(get_current_admin),  # Admin only
+    db: Session = Depends(get_db)
+):
     analysis = db.query(Analysis).filter(Analysis.id == analysis_id).first()
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")
@@ -54,8 +75,13 @@ async def update_analysis(analysis_id: int, analysis_data: schemas.AnalysisUpdat
     db.commit()
     return {"message": "Analysis updated"}
 
+# DELETE analysis - ADMIN ONLY
 @router.delete("/{analysis_id}", status_code=204)
-async def delete_analysis(analysis_id: int, db: Session = Depends(get_db)):
+async def delete_analysis(
+    analysis_id: int,
+    current_user: User = Depends(get_current_admin),  # Admin only
+    db: Session = Depends(get_db)
+):
     analysis = db.query(Analysis).filter(Analysis.id == analysis_id).first()
     if not analysis:
         raise HTTPException(status_code=404, detail="Analysis not found")

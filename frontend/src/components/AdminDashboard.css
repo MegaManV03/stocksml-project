@@ -1,0 +1,94 @@
+/* Admin Dashboard */
+.admin-dashboard {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.dashboard-header {
+  margin-bottom: 40px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-header h1 {
+  color: #333;
+  margin: 0 0 10px 0;
+  font-size: 1.8rem;
+}
+
+.dashboard-header p {
+  color: #666;
+  margin: 0;
+  font-size: 1rem;
+}
+
+/* Dashboard Buttons */
+.dashboard-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.button-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.dashboard-btn {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  cursor: pointer;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 15px;
+  transition: all 0.2s;
+}
+
+.dashboard-btn:hover {
+  border-color: #4F46E5;
+  box-shadow: 0 2px 8px rgba(79, 70, 229, 0.1);
+  transform: translateY(-2px);
+}
+
+.btn-icon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.btn-content h3 {
+  color: #333;
+  margin: 0 0 8px 0;
+  font-size: 1.2rem;
+}
+
+.btn-content p {
+  color: #666;
+  margin: 0;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .admin-dashboard {
+    padding: 15px;
+  }
+  
+  .button-row {
+    grid-template-columns: 1fr;
+  }
+  
+  .dashboard-btn {
+    padding: 15px;
+  }
+  
+  .btn-icon {
+    font-size: 1.5rem;
+  }
+}

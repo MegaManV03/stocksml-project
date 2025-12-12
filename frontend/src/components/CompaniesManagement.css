@@ -1,0 +1,493 @@
+/* CompaniesManagement.css */
+
+/* Main Container */
+.companies-management {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Header */
+.companies-header {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.companies-header h1 {
+  color: #333;
+  margin-bottom: 15px;
+  font-size: 1.8rem;
+}
+
+.stats {
+  display: flex;
+  gap: 15px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stats span {
+  background: #f5f5f5;
+  padding: 8px 15px;
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Content */
+.companies-content {
+  background: white;
+  padding: 25px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+}
+
+.section-header h3 {
+  color: #333;
+  margin: 0;
+  font-size: 1.3rem;
+}
+
+.header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons */
+.refresh-btn, .create-btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s;
+}
+
+.refresh-btn {
+  background: none;
+  border: 1px solid #ddd;
+  color: #666;
+}
+
+.refresh-btn:hover:not(:disabled) {
+  background-color: #f5f5f5;
+}
+
+.refresh-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.create-btn {
+  background-color: #4F46E5;
+  color: white;
+}
+
+.create-btn:hover {
+  background-color: #4338CA;
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  font-size: 1.1rem;
+}
+
+/* Table */
+.companies-table-container {
+  overflow-x: auto;
+  border-radius: 6px;
+  border: 1px solid #e0e0e0;
+}
+
+.companies-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.companies-table th {
+  background-color: #f8f9fa;
+  padding: 15px;
+  text-align: left;
+  font-weight: 600;
+  color: #555;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.companies-table td {
+  padding: 15px;
+  border-bottom: 1px solid #eee;
+  vertical-align: middle;
+}
+
+.companies-table tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Table Cells */
+.symbol-cell .symbol {
+  font-weight: 600;
+  color: #333;
+  background: #f0f9ff;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.name-cell strong {
+  color: #333;
+}
+
+.sector-badge {
+  background-color: #f0fdf4;
+  color: #10b981;
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.market-cap, .pe-ratio {
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.market-cap .icon {
+  color: #10b981;
+}
+
+.pe-ratio .icon {
+  color: #4F46E5;
+}
+
+/* Actions */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.action-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+
+.action-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+}
+
+.action-btn.view {
+  background-color: #e0f2fe;
+  color: #0ea5e9;
+}
+
+.action-btn.edit {
+  background-color: #fef3c7;
+  color: #d97706;
+}
+
+.action-btn.delete {
+  background-color: #fee2e2;
+  color: #dc2626;
+}
+
+.action-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* No Companies */
+.no-companies {
+  text-align: center;
+  padding: 50px 20px;
+  color: #666;
+}
+
+.no-companies svg {
+  color: #e0e0e0;
+  margin-bottom: 15px;
+}
+
+.no-companies p {
+  font-size: 1.1rem;
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(2px);
+}
+
+.modal {
+  background: white;
+  border-radius: 12px;
+  width: 500px;
+  max-width: 90%;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+
+.modal-header {
+  padding: 20px 25px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.modal-header h3 {
+  margin: 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.warning-icon {
+  color: #dc2626;
+}
+
+/* Modal Body */
+.modal-body {
+  padding: 25px;
+}
+
+/* Form Styles */
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+}
+
+.form-row .form-group {
+  flex: 1;
+  margin-bottom: 0;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #555;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: border-color 0.2s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+  outline: none;
+  border-color: #4F46E5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Company Details */
+.company-details {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.detail-row .label {
+  color: #666;
+  font-weight: 500;
+}
+
+.detail-row .value {
+  color: #333;
+  font-weight: 600;
+}
+
+.detail-row .highlight {
+  color: #10b981;
+}
+
+.symbol-badge {
+  background: #f0f9ff;
+  color: #0ea5e9;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-family: monospace;
+}
+
+.company-info {
+  background: #fef2f2;
+  padding: 15px;
+  border-radius: 6px;
+  margin-top: 15px;
+}
+
+.company-info p {
+  margin: 5px 0;
+  color: #666;
+}
+
+.warning-text {
+  color: #dc2626 !important;
+  font-weight: 600;
+  margin-top: 10px !important;
+}
+
+/* Modal Footer */
+.modal-footer {
+  padding: 20px 25px;
+  border-top: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  background: none;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  cursor: pointer;
+  color: #666;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.cancel-btn:hover {
+  background-color: #f5f5f5;
+}
+
+.confirm-btn {
+  padding: 10px 20px;
+  background-color: #4F46E5;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.confirm-btn:hover:not(:disabled) {
+  background-color: #4338CA;
+}
+
+.confirm-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.confirm-delete-btn {
+  padding: 10px 20px;
+  background-color: #dc2626;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.confirm-delete-btn:hover {
+  background-color: #b91c1c;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .companies-management {
+    padding: 15px;
+  }
+  
+  .stats {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 15px;
+  }
+  
+  .header-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .companies-table {
+    display: block;
+  }
+  
+  .companies-table th,
+  .companies-table td {
+    padding: 12px;
+  }
+}
+
+@media (max-width: 576px) {
+  .modal {
+    width: 95%;
+    margin: 10px;
+  }
+  
+  .modal-footer {
+    flex-direction: column;
+  }
+  
+  .modal-footer button {
+    width: 100%;
+  }
+}

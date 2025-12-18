@@ -3,11 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
-from .routers.sectors import router as sectors_router
-from .routers.companies import router as companies_router  
-from .routers.analyses import router as analyses_router
-from .routers.users import router as users_router
-from .routers.auth import router as auth_router, get_password_hash
+from routers.sectors import router as sectors_router
+from routers.companies import router as companies_router  
+from routers.analyses import router as analyses_router
+from routers.users import router as users_router
+from routers.auth import router as auth_router, get_password_hash
 from models import Base, User
 from database import SessionLocal, engine
 

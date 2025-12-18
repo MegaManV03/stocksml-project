@@ -3,13 +3,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
-from routers.sectors import router as sectors_router
-from routers.companies import router as companies_router  
-from routers.analyses import router as analyses_router
-from routers.users import router as users_router
-from routers.auth import router as auth_router, get_password_hash
-from models import Base, User
-from database import SessionLocal, engine
+from .routers.sectors import router as sectors_router
+from .routers.companies import router as companies_router  
+from .routers.analyses import router as analyses_router
+from .routers.users import router as users_router
+from .routers.auth import router as auth_router, get_password_hash
+from .models import Base, User
+from .database import SessionLocal, engine
 
 def make_user_admin():
     db = SessionLocal()
@@ -41,9 +41,14 @@ make_user_admin()
 app = FastAPI()
 
 # CORS - Update origins for production deployment
+origins = [
+    "http://localhost:5173",
+    "https://your-frontend-url.onrender.com",  # Add your actual Render URL here
+]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "https://your-frontend-url.onrender.com",],  # Change to your frontend URL for production
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

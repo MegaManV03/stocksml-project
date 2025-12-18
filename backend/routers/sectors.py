@@ -1,10 +1,10 @@
 from fastapi import APIRouter, HTTPException, Depends, Header
 from sqlalchemy.orm import Session
-from database import get_db
-from models import Sector
+from backend.database import get_db
+from backend.models import Sector
 import schemas
-from models import Company, User, Analysis
-from routers.auth import oauth2_scheme, get_current_member, get_current_admin
+from backend.models import Company, User, Analysis
+from backend.routers.auth import oauth2_scheme, get_current_member, get_current_admin
 
 
 router = APIRouter()

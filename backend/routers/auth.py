@@ -3,7 +3,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import User
-import schemas
+from backend import schemas
 from datetime import datetime, timedelta
 import jwt
 from jwt import PyJWTError as JWTError

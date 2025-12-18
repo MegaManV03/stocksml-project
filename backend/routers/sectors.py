@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Depends, Header
 from sqlalchemy.orm import Session
 from backend.database import get_db
 from backend.models import Sector
-import schemas
+from backend import schemas
 from backend.models import Company, User, Analysis
 from backend.routers.auth import oauth2_scheme, get_current_member, get_current_admin
 

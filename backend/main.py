@@ -8,8 +8,8 @@ from .routers.companies import router as companies_router
 from .routers.analyses import router as analyses_router
 from .routers.users import router as users_router
 from .routers.auth import router as auth_router, get_password_hash
-from .models import Base, User
-from .database import SessionLocal, engine
+from models import Base, User
+from database import SessionLocal, engine
 
 def make_user_admin():
     db = SessionLocal()

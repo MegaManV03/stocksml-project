@@ -3,27 +3,32 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
-# Read database URL from environment (Railway/Render provide DATABASE_URL)
-DATABASE_URL = os.environ.get("DATABASE_URL") or os.environ.get("SQLALCHEMY_DATABASE_URL")
+# Get database URL from environment variable
+DATABASE_URL = os.environ.get("DATABASE_URL")
 
-# Fallback to local SQLite for development
+# Fix for Render's PostgreSQL URL format
+if DATABASE_URL and DATABASE_URL.startswith("postgres://"):
+    DATABASE_URL = DATABASE_URL.replace("postgres://", "postgresql://", 1)
+
+# Fallback to SQLite only for local development
 if not DATABASE_URL:
     DATABASE_URL = "sqlite:///./test.db"
 
-# SQLite needs check_same_thread
+# Create engine with appropriate settings
 if DATABASE_URL.startswith("sqlite"):
-    engine = create_engine(DATABASE_URL, connect_args={"check_same_thread": False})
+    engine = create_engine(
+        DATABASE_URL, 
+        connect_args={"check_same_thread": False}
+    )
 else:
-    # For Postgres or other DBs
-    engine = create_engine(DATABASE_URL, pool_pre_ping=True)
+    # For PostgreSQL (Render)
+    engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# Declarative base for models
 Base = declarative_base()
 
-
 def get_db():
+    """Dependency for getting database session"""
     db = SessionLocal()
     try:
         yield db

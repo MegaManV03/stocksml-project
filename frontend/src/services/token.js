@@ -1,6 +1,14 @@
 // src/services/auth.js
 import axios from 'axios';
-import { setTokens, clearTokens, getRefreshToken, getAccessToken, shouldRefreshToken } from './token';
+import {
+  setAuthTokens,
+  clearAuthTokens,
+  getRefreshToken,
+  getAccessToken,
+  isTokenExpired,
+  getUserData,
+  refreshAccessToken as authRefreshAccessToken
+} from './auth';
 
 // Use configured API URL or same origin so deployed frontend hits the live backend
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
@@ -17,19 +25,19 @@ const api = axios.create({
 api.interceptors.request.use(
   async (config) => {
     const token = getAccessToken();
-    
-    // Check if token needs refresh BEFORE request
-    if (token && shouldRefreshToken()) {
+
+    // Check if token needs refresh BEFORE request (if expired)
+    if (token && isTokenExpired(token)) {
       console.log('🔄 Token needs refresh, attempting...');
       try {
-        const newToken = await refreshAccessToken();
+        const newToken = await authRefreshAccessToken();
         if (newToken) {
           config.headers.Authorization = `Bearer ${newToken}`;
           return config;
         }
       } catch (error) {
         console.error('Failed to refresh token:', error);
-        clearTokens();
+        clearAuthTokens();
         window.location.href = '/';
         return Promise.reject(error);
       }
@@ -75,23 +83,18 @@ api.interceptors.response.use(
 
 // Refresh token function
 export const refreshAccessToken = async () => {
-  const refreshToken = getRefreshToken();
+    const refreshToken = getRefreshToken();
   if (!refreshToken) {
     throw new Error('No refresh token available');
   }
   
   try {
-    const response = await axios.post(`${API_URL}/auth/refresh`, {
-      refresh_token: refreshToken
-    });
-    
-    const { access_token } = response.data;
-    localStorage.setItem('token', access_token);
-    console.log('✅ Token refreshed successfully');
-    return access_token;
+      // Delegate refresh to auth's helper so storage is consistent
+      const newToken = await authRefreshAccessToken(refreshToken);
+      return newToken;
   } catch (error) {
     console.error('❌ Token refresh failed:', error);
-    clearTokens();
+      clearAuthTokens();
     throw error;
   }
 };
@@ -104,9 +107,9 @@ export const login = async (username, password) => {
   
   const response = await axios.post(`${API_URL}/auth/login`, formData);
   const { access_token, refresh_token, role } = response.data;
-  
-  // Store tokens
-  setTokens(access_token, refresh_token, { username, role });
+
+  // Store tokens using auth helper
+  setAuthTokens(access_token, refresh_token, { username, role });
   
   // Trigger auth change event
   window.dispatchEvent(new Event('storage'));
@@ -122,7 +125,7 @@ export const register = async (userData) => {
 
 // Logout function
 export const logout = () => {
-  clearTokens();
+  clearAuthTokens();
   window.location.href = '/';
 };
 
@@ -146,7 +149,7 @@ export const verifyTokenOnStart = async () => {
       }
     }
     
-    return getUser();
+    return getUserData();
   } catch (error) {
     console.error('Token verification failed:', error);
     clearTokens();

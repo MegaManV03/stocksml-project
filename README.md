@@ -42,3 +42,6 @@ JWT token required for protected routes. Three user roles with different permiss
 Run with:
 `cd .\backend\`
 `uvicorn main:app --reload`
+
+cd ./frontend
+npm run dev

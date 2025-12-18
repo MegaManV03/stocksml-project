@@ -1,1 +1,1 @@
-web: sh -c "cd frontend && npm ci && npm run build && cd .. && uvicorn backend.main:app --host 0.0.0.0 --port $PORT"
+web: gunicorn backend.main:app --worker-class uvicorn.workers.UvicornWorker --bind 0.0.0.0:$PORT

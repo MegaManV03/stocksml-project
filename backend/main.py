@@ -1,11 +1,14 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
+from pathlib import Path
 from routers.sectors import router as sectors_router
 from routers.companies import router as companies_router  
 from routers.analyses import router as analyses_router
 from routers.users import router as users_router
 from routers.auth import router as auth_router, get_password_hash
-from models import Base, Sector, User
+from models import Base, User
 from database import SessionLocal, engine
 
 def make_user_admin():
@@ -29,42 +32,47 @@ def make_user_admin():
     finally:
         db.close()
 
-def create_test_data():
-    db = SessionLocal()
-    try:
-        # Tik sektoriai, jei jų nėra
-        if db.query(Sector).count() == 0:
-            tech = Sector(name="Technology", description="Tech companies")
-            healthcare = Sector(name="Healthcare", description="Medical companies")
-            db.add_all([tech, healthcare])
-            db.commit()
-            print("✅ Added sectors")
-        else:
-            print(f"✅ Sectors exist: {db.query(Sector).count()}")
-    finally:
-        db.close()
-
-# Sukurk lenteles
+# Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Tik sektoriai ir admin user
-create_test_data()
+# Create admin user only (sectors removed as requested)
 make_user_admin()
 
 app = FastAPI()
 
-# CORS
+# CORS - Update origins for production deployment
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],
+    allow_origins=["http://localhost:5173", "https://your-frontend-url.onrender.com",],  # Change to your frontend URL for production
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Routeriai
+# Routers
 app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/api/v1", tags=["users"])
 app.include_router(sectors_router, prefix="/sectors", tags=["sectors"])
 app.include_router(companies_router, prefix="/companies", tags=["companies"])
 app.include_router(analyses_router, prefix="/analyses", tags=["analyses"])
+
+# Serve frontend static files
+BASE_DIR = Path(__file__).resolve().parent.parent
+FRONTEND_DIST = BASE_DIR / "frontend" / "dist"
+FRONTEND_PUBLIC = BASE_DIR / "frontend" / "public"
+
+index_file = None
+if FRONTEND_DIST.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_DIST), html=True), name="frontend")
+    index_file = FRONTEND_DIST / "index.html"
+elif FRONTEND_PUBLIC.exists():
+    app.mount("/", StaticFiles(directory=str(FRONTEND_PUBLIC), html=True), name="frontend")
+    index_file = FRONTEND_PUBLIC / "index.html"
+
+if index_file and index_file.exists():
+    @app.get("/{full_path:path}")
+    async def spa_catch_all(full_path: str):
+        # Prevent catching API routes
+        if full_path.startswith(("api", "auth", "sectors", "companies", "analyses")):
+            raise HTTPException(status_code=404)
+        return FileResponse(index_file)

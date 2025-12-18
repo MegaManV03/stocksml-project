@@ -1,6 +1,22 @@
-fastapi
-uvicorn
-sqlalchemy
-PyJWT
-passlib[bcrypt]
-python-multipart
+# Core FastAPI dependencies
+fastapi==0.104.1
+uvicorn[standard]==0.24.0
+gunicorn==21.2.0
+
+# Database
+sqlalchemy==2.0.23
+
+# Authentication & Security
+PyJWT==2.8.0
+passlib[bcrypt]==1.7.4
+python-multipart==0.0.6
+python-dotenv==1.0.0
+
+# Data processing
+pandas==2.0.3
+yfinance==0.2.28
+aiohttp==3.9.0
+nest-asyncio==1.5.8
+
+# CORS middleware (if not already in fastapi)
+starlette==0.27.0

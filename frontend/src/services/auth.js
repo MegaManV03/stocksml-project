@@ -1,7 +1,8 @@
 // src/services/auth.js - FIXED EXPORTS
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8000';
+// Use Vite env var if provided, otherwise call same origin (works on Render)
+const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
 // Create axios instance
 const api = axios.create({

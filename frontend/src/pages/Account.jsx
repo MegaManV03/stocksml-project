@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import API from '../services/api';
 import './Account.css';
 
 const API_URL = 'http://localhost:8000';
@@ -21,8 +22,8 @@ export default function Account() {
   const [deleteConfirm, setDeleteConfirm] = useState('');
   
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    const userStr = localStorage.getItem('user');
+      const token = localStorage.getItem('token');
+      const userStr = localStorage.getItem('user');
     
     if (!token || !userStr) {
       navigate('/login');
@@ -55,17 +56,10 @@ export default function Account() {
     }
     
     try {
-      const token = localStorage.getItem('token');
-      await axios.patch(
-        `${API_URL}/api/v1/users/me/password`,
-        {
-          current_password: changePassword.current,
-          new_password: changePassword.new
-        },
-        {
-          headers: { Authorization: `Bearer ${token}` }
-        }
-      );
+      await API.patch('/api/v1/users/me/password', {
+        current_password: changePassword.current,
+        new_password: changePassword.new
+      });
       
       setSuccess('Password changed successfully');
       setChangePassword({ current: '', new: '', confirm: '' });
@@ -85,10 +79,7 @@ export default function Account() {
     }
     
     try {
-      const token = localStorage.getItem('token');
-      await axios.delete(`${API_URL}/api/v1/users/me`, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
+      await API.delete('/api/v1/users/me');
       
       localStorage.removeItem('token');
       localStorage.removeItem('user');

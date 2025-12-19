@@ -21,8 +21,13 @@ if DATABASE_URL.startswith("sqlite"):
         connect_args={"check_same_thread": False}
     )
 else:
-    # For PostgreSQL (Render)
-    engine = create_engine(DATABASE_URL)
+    # For PostgreSQL (Render) - enforce SSL if not already present
+    # If the URL already contains sslmode=, rely on it; otherwise pass sslmode via connect_args
+    connect_args = {}
+    if "sslmode=" not in DATABASE_URL:
+        connect_args["sslmode"] = "require"
+
+    engine = create_engine(DATABASE_URL, pool_pre_ping=True, connect_args=connect_args if connect_args else None)
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()

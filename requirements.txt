@@ -21,3 +21,4 @@ nest-asyncio==1.5.8
 # CORS middleware (if not already in fastapi)
 starlette==0.27.0
 pydantic<2.0.0
+psycopg2-binary>=2.9.6

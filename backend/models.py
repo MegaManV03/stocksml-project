@@ -74,7 +74,7 @@ class Analysis(Base):
     predicted_low = Column(DECIMAL(10, 2))
     predicted_open = Column(DECIMAL(10, 2))
     predicted_close = Column(DECIMAL(10, 2))
-    signal = Column(Enum('BUY', 'SELL', 'HOLD', 'STRONG_BUY', 'STRONG_SELL'))
+    signal = Column(Enum('BUY', 'SELL', 'HOLD', 'STRONG_BUY', 'STRONG_SELL', name='analysis_signal'))
     confidence_score = Column(DECIMAL(3, 2))
     
     created_at = Column(DateTime, default=datetime.utcnow)

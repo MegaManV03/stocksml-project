@@ -60,7 +60,7 @@ app = FastAPI()
 # CORS - Update origins for production deployment
 origins = [
     "http://localhost:5173",
-    "https://your-frontend-url.onrender.com",  # Add your actual Render URL here
+    "https://stocksml.onrender.com",  # Add your actual Render URL here
 ]
 
 app.add_middleware(

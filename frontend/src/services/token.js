@@ -13,6 +13,7 @@ import {
 // Use configured API URL or same origin so deployed frontend hits the live backend
 const API_URL = import.meta.env.VITE_API_URL || window.location.origin;
 
+
 // Create axios instance with interceptors
 const api = axios.create({
   baseURL: API_URL,

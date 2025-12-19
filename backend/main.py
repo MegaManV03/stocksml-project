@@ -3,12 +3,18 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
-from dotenv import load_dotenv
 
-# Load local env file `stocksml.env` (only if present). Render/Render-like platforms provide env vars via UI.
+# Optionally load `stocksml.env` in development if python-dotenv is installed.
+# We avoid hard-failing when dotenv is not available so you can run without it.
+try:
+    from dotenv import load_dotenv  # type: ignore
+except Exception:
+    load_dotenv = None
+
+# Load local env file `stocksml.env` (only if present and load_dotenv is available).
 ROOT = Path(__file__).resolve().parent.parent
 env_path = ROOT / "stocksml.env"
-if env_path.exists():
+if env_path.exists() and load_dotenv:
     load_dotenv(env_path)
 
 from backend.routers.sectors import router as sectors_router

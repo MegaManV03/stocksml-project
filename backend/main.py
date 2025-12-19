@@ -24,6 +24,9 @@ from backend.routers.users import router as users_router
 from backend.routers.auth import router as auth_router, get_password_hash
 from backend.models import Base, User
 from backend.database import SessionLocal, engine
+from fastapi import Request
+from starlette.exceptions import HTTPException as StarletteHTTPException
+from fastapi.responses import PlainTextResponse
 
 def make_user_admin():
     db = SessionLocal()
@@ -95,3 +98,13 @@ if index_file and index_file.exists():
         if full_path.startswith(("api", "auth", "sectors", "companies", "analyses")):
             raise HTTPException(status_code=404)
         return FileResponse(index_file)
+
+    @app.exception_handler(StarletteHTTPException)
+    async def spa_404_handler(request: Request, exc: StarletteHTTPException):
+        # If a static file or route was not found, and the path isn't an API path,
+        # return the SPA index so the frontend router can handle the route.
+        path = request.url.path.lstrip("/")
+        api_prefixes = ("api", "auth", "sectors", "companies", "analyses")
+        if exc.status_code == 404 and index_file and not path.startswith(api_prefixes):
+            return FileResponse(index_file)
+        return PlainTextResponse(str(exc.detail), status_code=exc.status_code)

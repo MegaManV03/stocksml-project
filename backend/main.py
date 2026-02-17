@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
+import os
 
 # Optionally load `stocksml.env` in development if python-dotenv is installed.
 # We avoid hard-failing when dotenv is not available so you can run without it.
@@ -17,6 +18,10 @@ env_path = ROOT / "stocksml.env"
 if env_path.exists() and load_dotenv:
     load_dotenv(env_path)
 
+ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "kri")
+ADMIN_PASSWORD = os.getenv("ADMIN_USERNAME", "kri")
+ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "kri@mail.com")
+
 from backend.routers.sectors import router as sectors_router
 from backend.routers.companies import router as companies_router
 from backend.routers.analyses import router as analyses_router
@@ -29,20 +34,21 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import PlainTextResponse
 from contextlib import asynccontextmanager
 
+
 #creates an admin or makes existing user an admin
 def make_user_admin():
     db = SessionLocal()
     try:
-        user = db.query(User).filter(User.username == "kri").first()
+        user = db.query(User).filter(User.username == ADMIN_USERNAME).first()
         if user:
             user.role = "admin"
             db.commit()
             print(f"Made {user.username} an admin!")
         else:
             admin_user = User(
-                username="kri",
-                email="kri@yahjo.com", 
-                hashed_password=get_password_hash("kri"),
+                username=ADMIN_USERNAME,
+                email=ADMIN_EMAIL, 
+                hashed_password=get_password_hash(ADMIN_PASSWORD),
                 role="admin"
             )
             db.add(admin_user)

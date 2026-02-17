@@ -57,8 +57,11 @@ def make_user_admin():
     finally:
         db.close()
 
-# Create database tables
-Base.metadata.create_all(bind=engine)
+try:
+    # Create database tables    
+    Base.metadata.create_all(bind=engine)
+except Exception as e:
+    print(F" Database creation Failed: {e}")
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):

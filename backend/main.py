@@ -27,7 +27,9 @@ from backend.database import SessionLocal, engine
 from fastapi import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import PlainTextResponse
+from contextlib import asynccontextmanager
 
+#creates an admin or makes existing user an admin
 def make_user_admin():
     db = SessionLocal()
     try:
@@ -35,7 +37,7 @@ def make_user_admin():
         if user:
             user.role = "admin"
             db.commit()
-            print(f"✅ Made {user.username} an admin!")
+            print(f"Made {user.username} an admin!")
         else:
             admin_user = User(
                 username="kri",
@@ -45,22 +47,26 @@ def make_user_admin():
             )
             db.add(admin_user)
             db.commit()
-            print("✅ Created admin user!")
+            print("Created admin user!")
     finally:
         db.close()
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
-# Create admin user only (sectors removed as requested)
-make_user_admin()
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    #making user an admin on the startup
+    make_user_admin()
+    yield
 
-app = FastAPI()
+app = FastAPI(lifespan=lifespan)
+
 
 # CORS - Update origins for production deployment
 origins = [
     "http://localhost:5173",
-    "https://stocksml.onrender.com",  # Add your actual Render URL here
+    "https://stocksml.onrender.com", 
 ]
 
 app.add_middleware(

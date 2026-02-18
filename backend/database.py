@@ -3,7 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 from config import settings
-from typing import Generator
+from typing import Generator, Dict, Optional
 
 
 
@@ -13,18 +13,21 @@ if settings.DATABASE_URL and settings.DATABASE_URL.startswith("postgres://"):
 
 print(f"Using database: {settings.DATABASE_URL}")
 
+def get_postgres_connect_args(db_url: str) -> Optional[Dict[str, str]]:
+    """Helper fuction to configure PostgreSQL connection arguments"""
+    connect_args: Dict[str, str]= {}
+    if "sslmode=" not in db_url:
+        connect_args["sslmode"] = settings.POSTGRES_SSL_MODE
+    return connect_args if connect_args else None
+
+
 try:
     # Create engine with appropriate settings
     if settings.DATABASE_URL.startswith("sqlite"):
         engine = create_engine(settings.DATABASE_URL, connect_args={"check_same_thread": settings.SQLite_CHECK_SAME_THREAD})
         print("SQLite engine created")
     else:
-        # For PostgreSQL - enforce SSL if not already present
-        connect_args: dict = {}
-        if "sslmode=" not in settings.DATABASE_URL:
-            connect_args["sslmode"] = settings.POSTGRES_SSL_MODE
-
-        engine = create_engine(settings.DATABASE_URL, pool_pre_ping=settings.POSTGRES_POOL_PRE_PING, connect_args=connect_args if connect_args else None)
+        engine = create_engine(settings.DATABASE_URL, pool_pre_ping=settings.POSTGRES_POOL_PRE_PING, connect_args=get_postgres_connect_args(settings.DATABASE_URL))
         print("PostgreSQL engine created")
 
     with engine.connect() as connection:
@@ -32,6 +35,7 @@ try:
 
 except SQLAlchemyError as e:
     print(f"Database connection failed: {e}")
+    raise
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
@@ -48,9 +52,3 @@ def get_db() -> Generator[Session, None, None]:
     finally:
         db.close()
         print("Database session closed")
-
-#adding error handling
-#Consider using config.py to store database settings separately
-#Add type hints for better code clarity
-#Move connect_args logic to a helper function for cleaner code
-

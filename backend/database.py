@@ -1,8 +1,10 @@
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
 from config import settings
+from typing import Generator
+
 
 
 # Fix for older postgres URLs
@@ -18,7 +20,7 @@ try:
         print("SQLite engine created")
     else:
         # For PostgreSQL - enforce SSL if not already present
-        connect_args = {}
+        connect_args: dict = {}
         if "sslmode=" not in settings.DATABASE_URL:
             connect_args["sslmode"] = settings.POSTGRES_SSL_MODE
 
@@ -35,7 +37,7 @@ SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 Base = declarative_base()
 
 
-def get_db():
+def get_db() -> Generator[Session, None, None]:
     db = SessionLocal()
     try:
         yield db

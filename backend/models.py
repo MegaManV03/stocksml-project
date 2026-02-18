@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, Foreign
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import ENUM
-from datetime import datetime
+from datetime import datetime, timezone
 
 Base = declarative_base()
 
@@ -14,16 +14,17 @@ class User(Base):
     username = Column(String, unique=True, index=True)
     hashed_password = Column(String)
     role = Column(ENUM('guest', 'member', 'admin', name='user_roles'), default='guest')
-    created_at = Column(DateTime, default=datetime.utcnow)  # Keep as DateTime
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))  # Keep as DateTime
 
 
 class UserCompanyAccess(Base):
     __tablename__ = 'user_company_access'
+    
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(Integer, ForeignKey('users.id'))
     company_id = Column(Integer, ForeignKey('companies.id'))
     granted_by = Column(Integer, ForeignKey('users.id'))
-    granted_at = Column(DateTime, default=datetime.utcnow)  # Keep as DateTime
+    granted_at = Column(DateTime, default=datetime.now(timezone.utc))  # Keep as DateTime
 
 
 class Sector(Base):
@@ -32,7 +33,7 @@ class Sector(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
     description = Column(Text)
-    created_at = Column(DateTime, default=datetime.utcnow)  # CHANGED: Add default
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))  # CHANGED: Add default
 
 
 class Company(Base):
@@ -51,7 +52,7 @@ class Company(Base):
     next_earnings_date = Column(DATE)
     earnings_estimate = Column(DECIMAL(10, 2))
     dividend_yield = Column(DECIMAL(5, 2))
-    last_updated = Column(DateTime, default=datetime.utcnow)  # CHANGED: DATETIME → DateTime with default
+    last_updated = Column(DateTime, default=datetime.now(timezone.utc))  # CHANGED: DATETIME → DateTime with default
 
 
 class Analysis(Base):
@@ -74,9 +75,7 @@ class Analysis(Base):
     signal = Column(ENUM('BUY', 'SELL', 'HOLD', 'STRONG_BUY', 'STRONG_SELL', name='analysis_signal'))
     confidence_score = Column(DECIMAL(3, 2))
     
-    created_at = Column(DateTime, default=datetime.utcnow)  # Keep as DateTime
-
-    company = relationship("Company", back_populates="analyses")
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))  # Keep as DateTime
 
 
 # Add the relationships after class definitions

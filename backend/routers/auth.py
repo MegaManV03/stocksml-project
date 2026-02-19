@@ -8,11 +8,13 @@ from datetime import datetime, timedelta
 import jwt
 from jwt import PyJWTError as JWTError
 from passlib.context import CryptContext
+import os
 
+#creating a router instance
 router = APIRouter()
 
 # JWT settings
-SECRET_KEY = "your-secret-key-here"
+SECRET_KEY = os.getenv("SECRET_KEY", "fallback-dev-key")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 30
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -34,10 +36,11 @@ def authenticate_user(db: Session, username: str, password: str):
 
 def create_access_token(data: dict, expires_delta: timedelta = None):
     to_encode = data.copy()
+
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.utcnow() + timedelta(minutes=15)
+        expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
@@ -52,7 +55,7 @@ def create_refresh_token(data: dict):
 
 
 async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    print(f"🛑🛑🛑 TOKEN RECEIVED: {token}")  # ← THIS WILL SHOW IF TOKEN ARRIVES
+    print(f"TOKEN RECEIVED: {token}")
     
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -61,30 +64,28 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: Session = De
     )
     
     if not token:
-        print("🛑🛑🛑 NO TOKEN RECEIVED!")
+        print("NO TOKEN RECEIVED!")
         raise credentials_exception
         
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        print(f"🛑🛑🛑 DECODED PAYLOAD: {payload}")  # ← THIS SHOWS DECODING
         username: str = payload.get("sub")
         role: str = payload.get("role")
         if username is None:
             raise credentials_exception
+        
     except JWTError as e:
-        print(f"🛑🛑🛑 JWT ERROR: {e}")  # ← THIS SHOWS DECODE ERRORS
+        print(f"JWT ERROR: {e}")  # ← THIS SHOWS DECODE ERRORS
         raise credentials_exception
     
     user = db.query(User).filter(User.username == username).first()
-    print(f"🛑🛑🛑 USER FOUND: {user}")  # ← THIS SHOWS USER SEARCH
+    print(f"USER FOUND: {user}")  # ← THIS SHOWS USER SEARCH
     if user is None:
         raise credentials_exception
     
     return user
     
 
-
-# Funkcijos rolėms patikrinti
 async def get_current_admin(current_user: User = Depends(get_current_user)):
     if current_user.role != "admin":
         raise HTTPException(status_code=403, detail="Admin access required")
@@ -123,18 +124,21 @@ async def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
 
 @router.post("/login")
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
+
+    #authenticates the user and raises exception if credentials are not valid
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
         )
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    #creates access and refresh token for the user
     access_token = create_access_token(
         data={"sub": user.username, "role": user.role}
     )
     refresh_token = create_refresh_token(
-        data={"sub": user.username}
+        data={"sub": user.username, "role": user.role}
     )
     return {
         "access_token": access_token, 
@@ -143,6 +147,7 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = 
         "role": user.role
     }
 
+#return new access token
 @router.post("/refresh")
 async def refresh_token(data: dict):  
     credentials_exception = HTTPException(
@@ -150,10 +155,12 @@ async def refresh_token(data: dict):
         detail="Invalid refresh token",
     )
     
+    #takes refresh token and raises exception if it is false
     refresh_token = data.get("refresh_token")  
     if not refresh_token:
         raise credentials_exception
     
+    #decodes the token and calls create_access_token with token data
     try:
         payload = jwt.decode(refresh_token, SECRET_KEY, algorithms=[ALGORITHM])
         if payload.get("type") != "refresh":
@@ -171,3 +178,5 @@ async def refresh_token(data: dict):
         expires_delta=access_token_expires
     )
     return {"access_token": new_access_token, "token_type": "bearer"}
+
+##add token blacklist

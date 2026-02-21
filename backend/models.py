@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, Text, ForeignKey, DECIMAL, Table, DATE, BIGINT
+from sqlalchemy import Column,Index, Integer, String, Boolean, DateTime, Text, ForeignKey, DECIMAL, Table, DATE, BIGINT
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.dialects.postgresql import ENUM
@@ -77,9 +77,54 @@ class Analysis(Base):
     
     created_at = Column(DateTime, default=datetime.now(timezone.utc))  # Keep as DateTime
 
+class Stock_Prices(Base):
+    __tablename__ = "stock_prices"
+
+    id = Column(Integer, primary_key=True)
+    company_id = Column(Integer, ForeignKey('companies.id'))
+
+    timestamp = Column(ENUM('5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m'))
+    date = Column(datetime)
+    open_price = Column(DECIMAL(10, 2))
+    high_price = Column(DECIMAL(10, 2))
+    close_price = Column(DECIMAL(10, 2))
+    low_price = Column(DECIMAL(10, 2))
+    volume = Column(BIGINT)
+
+    __table_args__ = (
+        Index('idx_company_date', 'company_id', 'date'),
+    )
+
+
+class Price_Predictions(Base):
+    __tablename__ = "predicted_stock_prices"
+
+    id = Column(Integer, primary_key=True)
+    company_id = Column(Integer, ForeignKey('companies.id'))
+
+    timestamp = Column(ENUM('5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m'))
+    date = Column(datetime)
+    open_price = Column(DECIMAL(10, 2))
+    high_price = Column(DECIMAL(10, 2))
+    close_price = Column(DECIMAL(10, 2))
+    low_price = Column(DECIMAL(10, 2))
+    volume = Column(BIGINT)
+
+    created_at = Column(DateTime, default=datetime.now(timezone.utc))
+
+    __table_args__ = (
+        Index('idx_pred_company_date', 'company_id', 'date'),
+    )
+
 
 # Add the relationships after class definitions
 Sector.companies = relationship("Company", back_populates="sector")
 Company.sector = relationship("Sector", back_populates="companies")
 Company.analyses = relationship("Analysis", back_populates="company")
 Analysis.company = relationship("Company", back_populates="analyses")
+
+Company.stock_prices = relationship("Stock_Prices", back_populates='company')
+Company.price_predictions = relationship("Price_Predictions", back_populates='company')
+
+Stock_Prices.company = relationship("Company", back_populates='stock_prices')
+Price_Predictions.company = relationship("Company", back_populates='price_predictions')

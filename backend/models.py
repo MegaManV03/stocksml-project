@@ -6,6 +6,8 @@ from datetime import datetime, timezone
 
 Base = declarative_base()
 
+
+
 class User(Base):
     __tablename__ = "users"
 
@@ -83,8 +85,8 @@ class Stock_Prices(Base):
     id = Column(Integer, primary_key=True)
     company_id = Column(Integer, ForeignKey('companies.id'))
 
-    timestamp = Column(ENUM('5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m'))
-    date = Column(datetime)
+    timestamp = Column(ENUM('1m', '5min', '15min', '30min', '1h', '5h', '1d'), name='timestamp')
+    date = Column(DateTime)
     open_price = Column(DECIMAL(10, 2))
     high_price = Column(DECIMAL(10, 2))
     close_price = Column(DECIMAL(10, 2))
@@ -102,8 +104,8 @@ class Price_Predictions(Base):
     id = Column(Integer, primary_key=True)
     company_id = Column(Integer, ForeignKey('companies.id'))
 
-    timestamp = Column(ENUM('5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m'))
-    date = Column(datetime)
+    timestamp = Column(ENUM('1m', '5min', '15min', '30min', '1h', '5h', '1d'), name='timestamp')
+    date = Column(DateTime)
     open_price = Column(DECIMAL(10, 2))
     high_price = Column(DECIMAL(10, 2))
     close_price = Column(DECIMAL(10, 2))

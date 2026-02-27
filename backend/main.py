@@ -34,7 +34,6 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import PlainTextResponse
 from contextlib import asynccontextmanager
 
-
 #creates an admin or makes existing user an admin
 def make_user_admin():
     db = SessionLocal()
@@ -56,6 +55,7 @@ def make_user_admin():
             print("Created admin user!")
     finally:
         db.close()
+
 
 try:
     # Create database tables    

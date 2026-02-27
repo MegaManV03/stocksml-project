@@ -1,10 +1,14 @@
+
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker, Session
 from sqlalchemy.exc import SQLAlchemyError
-from config import settings
 from typing import Generator, Dict, Optional
-
+import os
+import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from config import settings
+from models import Base
 
 
 # Fix for older postgres URLs
@@ -38,7 +42,9 @@ except SQLAlchemyError as e:
     raise
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-Base = declarative_base()
+
+
+Base.metadata.create_all(bind=engine)
 
 
 def get_db() -> Generator[Session, None, None]:

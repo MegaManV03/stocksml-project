@@ -69,6 +69,53 @@ class Analysis(AnalysisBase):
     class Config:
         from_attributes = True
 
+class Stock_Prices_Base(BaseModel):
+    company_id: int
+    timestamp: Literal['5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m']
+    date: datetime
+    open_price: float=0.0
+    high_price: float=0.0
+    low_price: float=0.0
+    close_price: float=0.0
+    volume: int=0
+
+class Stock_Prices_Create(Stock_Prices_Base):
+    pass
+
+class Stock_Prices_Update(Stock_Prices_Base):
+    pass
+
+class Stock_Prices(Stock_Prices_Base):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class Price_Predictions_Base(BaseModel):
+    company_id: int
+    timestamp: Literal['5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m']
+
+    date: datetime
+    open_price: float=0.0
+    high_price: float=0.0
+    low_price: float=0.0
+    close_price: float=0.0
+    volume: int=0
+
+
+class Price_Predictions_Create(Price_Predictions_Base):
+    pass
+
+class Price_Predictions_Update(Price_Predictions_Base):
+    pass
+
+class Price_Predictions(Price_Predictions_Base):
+
+    created_at: datetime
+
+    class Config:
+        from_attributes = True
+
 
 class UserBase(BaseModel):
     username: str

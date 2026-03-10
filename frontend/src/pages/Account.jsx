@@ -4,7 +4,7 @@ import axios from 'axios';
 import API from '../services/api';
 import './Account.css';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 export default function Account() {
   const navigate = useNavigate();

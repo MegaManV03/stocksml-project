@@ -7,7 +7,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faSync, faBuilding } from '@fortawesome/free-solid-svg-icons';
 import './Companies.css';
 
-const API_URL = 'http://localhost:8000';
+const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 const Companies = () => {
   const [companies, setCompanies] = useState([]);

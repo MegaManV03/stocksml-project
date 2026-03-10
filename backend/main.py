@@ -70,7 +70,8 @@ app = FastAPI(lifespan=lifespan)
 # CORS - Update origins for production deployment
 origins = [
     "http://localhost:5173",
-    "https://stocksml.onrender.com", 
+    "https://stocksml.onrender.com",
+    "http://72.60.131.76:3000"
 ]
 
 app.add_middleware(

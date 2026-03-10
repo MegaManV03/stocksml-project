@@ -15,7 +15,7 @@ class SectorUpdate(SectorBase):
 class Sector(BaseModel):
     id: int
     name: str
-    description: str
+    description: Optional[str] = None
     
     class Config:
         from_attributes = True
@@ -25,9 +25,9 @@ class CompanyBase(BaseModel):
     sector_id: int
     symbol: str
     company_name: str
-    market_cap: float
-    pe_ratio: float
-    revenue: float
+    market_cap: Optional[float] = None
+    pe_ratio: Optional[float] = None
+    revenue: Optional[float] = None
 
 class CompanyCreate(CompanyBase):
     pass
@@ -92,30 +92,26 @@ class Stock_Prices(Stock_Prices_Base):
         from_attributes = True
 
 class Price_Predictions_Base(BaseModel):
-    company_id: int
-    timestamp: Literal['5min', '15min', '30min', '1h', '5h', '1d', '1w', '1m']
-
-    date: datetime
-    open_price: float=0.0
-    high_price: float=0.0
-    low_price: float=0.0
-    close_price: float=0.0
-    volume: int=0
-
+    stock_price_id: int  
+    long_probability: float  
+    short_probability: float  
+    model_version: str  
+    prediction_date: datetime  
 
 class Price_Predictions_Create(Price_Predictions_Base):
     pass
 
-class Price_Predictions_Update(Price_Predictions_Base):
-    pass
+class Price_Predictions_Update(BaseModel):
+    long_probability: Optional[float] = None
+    short_probability: Optional[float] = None
+    model_version: Optional[str] = None
 
 class Price_Predictions(Price_Predictions_Base):
-
+    id: int
     created_at: datetime
 
     class Config:
         from_attributes = True
-
 
 class UserBase(BaseModel):
     username: str

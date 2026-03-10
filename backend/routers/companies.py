@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from backend.database import get_db
-from backend.models import Company, User
+from backend.models import Company, User,Stock_Prices
 from backend import schemas
 from backend.routers.auth import get_current_admin, get_current_member  # Add this import
 
@@ -40,7 +40,6 @@ async def create_company(
 @router.get("/{company_id}", response_model=schemas.Company)
 async def get_company(
     company_id: int,
-    current_user: User = Depends(get_current_member),  # Changed from get_current_admin
     db: Session = Depends(get_db)
 ):
     company = db.query(Company).filter(Company.id == company_id).first()
@@ -86,3 +85,16 @@ async def delete_company(
     db.delete(company)
     db.commit()
     return {"message": "Company deleted"}
+
+@router.get('/{company_id}/stock-prices')
+async def get_company_stock_prices(
+    company_id: int,
+    timeframe: str = '15m',
+    db: Session = Depends(get_db),
+):
+    stock_prices = db.query(Stock_Prices)\
+        .filter(Stock_Prices.company_id == company_id)\
+        .filter(Stock_Prices.timestamp == timeframe).order_by(Stock_Prices.date.desc())\
+        .all()
+    
+    return stock_prices

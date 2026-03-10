@@ -97,7 +97,6 @@ async def get_sector_company(sector_id: int, company_id: int, db: Session = Depe
 async def get_sector_company_analyses(
     sector_id: int, 
     company_id: int, 
-    current_user: User = Depends(get_current_member),  # ← PRIDĖTA
     db: Session = Depends(get_db)
 ):
     # Verify sector exists

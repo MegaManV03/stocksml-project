@@ -6,149 +6,75 @@ import './Home.css';
 const API_URL = 'http://localhost:8000';
 
 export default function Home() {
-  const [sectors, setSectors] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [stats, setStats] = useState({
-    totalSectors: 0,
-    totalCompanies: 0,
-    featuredSectors: []
-  });
   
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchCompanies = async () => {
       try {
-        // Fetch sectors
-        const sectorsResponse = await axios.get(`${API_URL}/sectors/`);
-        setSectors(sectorsResponse.data);
+        // Fetch companies with IDs 1-5
+        const companyIds = [1, 2, 3, 4, 5, 6];
+        const companyPromises = companyIds.map(id => 
+          axios.get(`${API_URL}/companies/${id}`)
+        );
         
-        // Calculate stats
-        const totalSectors = sectorsResponse.data.length;
+        const responses = await Promise.all(companyPromises);
+        const companiesData = responses.map(res => res.data);
+        setCompanies(companiesData);
         
-        // Get companies count (you might need to adjust this based on your API)
-        let totalCompanies = 0;
-        try {
-          const companiesResponse = await axios.get(`${API_URL}/companies/`);
-          totalCompanies = companiesResponse.data.length;
-        } catch (e) {
-          // If companies endpoint doesn't exist, estimate
-          totalCompanies = totalSectors * 10; // Assuming ~10 companies per sector
-        }
-        
-        // Get featured sectors (first 3)
-        const featuredSectors = sectorsResponse.data.slice(0, 3);
-        
-        setStats({
-          totalSectors,
-          totalCompanies,
-          featuredSectors
-        });
       } catch (error) {
-        console.error('Error:', error);
+        console.error('Error fetching companies:', error);
       } finally {
         setLoading(false);
       }
     };
     
-    fetchData();
+    fetchCompanies();
   }, []);
   
   if (loading) return (
     <div className="loading">
       <div className="loading-spinner"></div>
-      <p>Loading sectors data...</p>
+      <p>Loading companies...</p>
     </div>
   );
   
   return (
-    <div className="home-container">
-      
-      {/* Hero Section */}
+    <>
+      {/* Hero Section - OUTSIDE container */}
       <div className="hero-section">
-        <h1 className="hero-title">Stock Market Analysis Platform</h1>
+        <h1 className="hero-title">AI-Powered Stock Prediction Engine</h1>
         <p className="hero-subtitle">
-          Explore comprehensive financial analyses across multiple sectors. 
-          Get real-time insights, predictions, and trading signals for informed investment decisions.
+          Advanced transformer models analyzing market data to generate probabilistic long/short signals with automated daily predictions,<br />
+          giving you data-driven insights for smarter investing.
         </p>
-        
-        <div className="hero-stats">
-          <div className="stat-item">
-            <span className="stat-number">{stats.totalSectors}</span>
-            <span className="stat-label">Sectors</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-number">{stats.totalCompanies}</span>
-            <span className="stat-label">Companies</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-number">24/7</span>
-            <span className="stat-label">Real-time Data</span>
-          </div>
-          <div className="stat-item">
-            <span className="stat-number">AI</span>
-            <span className="stat-label">Powered Analytics</span>
+      </div>
+
+      {/* Companies Grid - INSIDE container */}
+      <div className="home-container">
+        <div className="companies-section">
+          <h2 className="section-title">
+            Prediction-Ready Companies
+          </h2>
+          <p className="section-subtitle">
+            Click on any company to view detailed financial analysis and AI-powered predictions.
+          </p>
+          
+          <div className="companies-grid">
+            {companies.map(company => (
+              <Link 
+                to={`/sectors/${company.sector_id}/companies/${company.id}/analyses`} 
+                key={company.id} 
+                className="company-card"
+              >
+                <h3 className="company-name">{company.company_name}</h3>
+                <p className="company-symbol">{company.symbol}</p>
+                <span className="view-link">View Analysis →</span>
+              </Link>
+            ))}
           </div>
         </div>
       </div>
-      
-      {/* Search Bar (Optional) */}
-      {/* <div className="search-container">
-        <input 
-          type="text" 
-          className="search-input" 
-          placeholder="Search sectors or companies..."
-        />
-      </div> */}
-      
-      {/* Sectors Grid */}
-      <div className="sectors-section">
-        <h2 className="section-title">
-          <span className="section-icon">🏢</span>
-          Market Sectors
-        </h2>
-        <p className="section-subtitle">
-          Click on any sector to explore companies and view detailed financial analyses.
-          Each sector contains multiple publicly traded companies with real-time data.
-        </p>
-        
-        {sectors.length === 0 ? (
-          <div className="empty-state">
-            <div className="empty-icon">🏢</div>
-            <h3 className="empty-title">No Sectors Available</h3>
-            <p className="empty-text">Sectors data is currently being loaded. Please check back later.</p>
-          </div>
-        ) : (
-          <div className="sectors-grid">
-            {sectors.map(sector => (
-              <div key={sector.id} className="sector-card">
-                <div className="sector-header">
-                  <h3 className="sector-name">
-                    <Link to={`/sectors/${sector.id}/companies`}>
-                      {sector.name}
-                    </Link>
-                  </h3>
-                </div>
-                
-                <p className="sector-description">
-                  {sector.description || 'Explore companies in this market sector for detailed financial analysis and investment insights.'}
-                </p>
-                
-                <div className="sector-footer">
-                  <Link 
-                    to={`/sectors/${sector.id}/companies`} 
-                    className="explore-btn"
-                  >
-                    <span>Explore Companies</span>
-                    <span>→</span>
-                  </Link>
-          
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-      
-      
-    </div>
+    </>
   );
 }

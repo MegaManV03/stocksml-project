@@ -1,19 +1,19 @@
-/* Layout.css - Cleaned up version */
+/* Layout.css - Dark Theme */
 
 /* LAYOUT */
 .layout {
+  background-color: #0a0a0a;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  font-family: 'Roboto', sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
 /* HEADER */
 .header {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-  color: white;
+  background-color: #0a0a0a;
+  border-bottom: 1px solid #1f1f1f;
   padding: 1rem 0;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
   position: sticky;
   top: 0;
   z-index: 1000;
@@ -23,99 +23,61 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
+  width: 100%;
 }
 
 .logo {
   display: flex;
   align-items: center;
-  gap: 12px;
-  transition: transform 0.3s ease;
   text-decoration: none;
-  color: white;
-}
-
-.logo:hover {
-  transform: translateY(-2px);
-}
-
-.logo-icon {
-  font-size: 2rem;
-  color: #4fc3f7;
 }
 
 .logo-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
+  margin-right: auto;
+}
+
+.logo-text {
   color: white;
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  letter-spacing: -0.02em;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', 'SF Pro Text', sans-serif;
 }
 
-.logo-link h1 {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 700;
-  letter-spacing: 0.5px;
-}
-
-/* DESKTOP NAVIGATION */
 .desktop-nav {
   display: flex;
-  gap: 1rem;
+  gap: 1.5rem;
   align-items: center;
+  margin-left: auto;
 }
 
-.desktop-nav a, .login-btn, .admin-btn {
-  color: white;
-  text-decoration: none;
-  padding: 0.6rem 1.2rem;
-  border-radius: 8px;
-  transition: all 0.3s ease;
+.desktop-nav > * {
   display: flex;
   align-items: center;
-  gap: 8px;
-  font-weight: 500;
-  font-size: 0.95rem;
-  position: relative;
-  overflow: hidden;
 }
 
-.desktop-nav a:hover, .login-btn:hover, .admin-btn:hover {
-  background: rgba(255,255,255,0.15);
-  transform: translateY(-3px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-}
-
-.desktop-nav a::after, .login-btn::after {
-  content: '';
-  position: absolute;
-  bottom: 0;
-  left: -100%;
-  width: 100%;
-  height: 3px;
-  background: #4fc3f7;
-  transition: left 0.3s ease;
-}
-
-.desktop-nav a:hover::after, .login-btn:hover::after {
-  left: 0;
-}
-
-/* Special buttons */
-.login-btn {
-  background: linear-gradient(135deg, #4fc3f7 0%, #29b6f6 100%);
+.desktop-nav a, 
+.desktop-nav button {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: #a1a1a1;
+  text-decoration: none;
+  font-size: 13px !important;
+  background: none;
   border: none;
   cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(79, 195, 247, 0.3);
+  white-space: nowrap;
+  line-height: 1;
 }
 
-.admin-btn {
-  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
-  border: none;
-  cursor: pointer;
-  font-weight: 600;
-  box-shadow: 0 3px 10px rgba(255, 152, 0, 0.3);
+.desktop-nav a:hover,
+.desktop-nav button:hover {
+  color: white;
 }
 
 /* USER INFO */
@@ -126,35 +88,37 @@
 }
 
 .user-role-badge {
-  background: linear-gradient(135deg, #ff9800 0%, #f57c00 100%);
+  background-color: #333;
   color: white;
   padding: 4px 10px;
-  border-radius: 15px;
+  border-radius: 4px;
   font-size: 0.7rem;
-  font-weight: 700;
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
-  box-shadow: 0 2px 5px rgba(255, 152, 0, 0.3);
 }
 
 .user-btn {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 0.6rem 1.2rem;
-  background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
-  color: white;
+  padding: 0.5rem 1.2rem;
+  background-color: white !important;
+  color: black !important;
   text-decoration: none;
-  border-radius: 8px;
-  font-weight: 600;
-  transition: all 0.3s ease;
+  border-radius: 6px;
+  font-weight: 500;
   border: none;
   cursor: pointer;
+  font-size: 20px !important;
+  line-height: 1;
+  height: fit-content;
+  margin: auto 0;
+  white-space: nowrap;
 }
 
 .user-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(76, 175, 80, 0.3);
+  background-color: #f0f0f0 !important;
+  color: black !important;
 }
 
 .username {
@@ -171,14 +135,8 @@
   border: none;
   color: white;
   font-size: 1.5rem;
-  cursor: button;
+  cursor: pointer;
   padding: 0.5rem;
-  border-radius: 6px;
-  transition: background 0.3s ease;
-}
-
-.hamburger:hover {
-  background: rgba(255,255,255,0.1);
 }
 
 /* MOBILE NAVIGATION */
@@ -186,14 +144,14 @@
   max-height: 0;
   overflow: hidden;
   flex-direction: column;
-  background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+  background-color: #0a0a0a;
   position: absolute;
   width: 100%;
   top: 100%;
   left: 0;
   z-index: 1000;
   transition: max-height 0.3s ease-out;
-  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+  border-bottom: 1px solid #1f1f1f;
 }
 
 .mobile-nav.open {
@@ -201,101 +159,75 @@
 }
 
 .mobile-nav a, .mobile-login-btn, .mobile-admin-btn {
-  color: white;
+  color: #a1a1a1;
   padding: 1rem 2rem;
   text-decoration: none;
-  border-bottom: 1px solid rgba(255,255,255,0.1);
+  border-top: 1px solid #1f1f1f;
   display: flex;
   align-items: center;
   gap: 12px;
   font-size: 1rem;
-  transition: background 0.3s ease;
 }
 
 .mobile-nav a:hover, .mobile-login-btn:hover {
-  background: rgba(255,255,255,0.1);
+  color: white;
+  background-color: #1a1a1a;
 }
 
 .mobile-login-btn, .mobile-admin-btn {
-  background: #4fc3f7;
+  background-color: #333;
+  color: white !important;
   border: none;
-  border-radius: 8px;
-  margin: 1rem 2rem;
+  width: 100%;
   cursor: pointer;
-  font-weight: 600;
-  justify-content: center;
+  font-weight: 500;
 }
 
-.mobile-admin-btn {
-  background: #ff9800;
+.login-btn {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  color: #a1a1a1;
+  text-decoration: none;
+  font-size: 20px !important;  
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+
+.signup-btn {
+  background-color: white !important;
+  color: black !important;
+  padding: 0.5rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 20px !important;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  line-height: 1;
+  height: fit-content;
+  margin: auto 0;
+}
+
+.signup-btn:hover {
+  background-color: #f0f0f0;
+  color: black !important;
 }
 
 /* CONTENT AREA */
 .content {
   flex: 1;
-  background: linear-gradient(180deg, #f5f7fa 0%, #e3f2fd 100%);
+  background-color: #0a0a0a;
   padding: 2rem 0;
-  min-height: calc(100vh - 140px);
+  min-height: calc(100vh - 70px - 300px);
 }
 
-.content-wrapper {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-}
 
-/* FOOTER */
-.footer {
-  background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-  color: white;
-  padding: 1.5rem 0;
-  box-shadow: 0 -4px 20px rgba(0,0,0,0.1);
-}
 
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 2rem;
-  text-align: center;
-}
-
-.footer-content p {
-  margin: 0 0 1rem 0;
-  font-size: 0.9rem;
-  opacity: 0.9;
-}
-
-.footer-links {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-.footer-links a {
-  color: #bbdefb;
-  text-decoration: none;
-  transition: all 0.3s ease;
-  font-weight: 500;
-  padding: 0.3rem 0.5rem;
-  border-radius: 4px;
-}
-
-.footer-links a:hover {
-  color: #4fc3f7;
-  background: rgba(79, 195, 247, 0.1);
-}
-
-.auth-status {
-  background: rgba(227, 242, 253, 0.2);
-  color: #bbdefb;
-  padding: 0.5rem 1rem;
-  border-radius: 20px;
-  font-size: 0.8rem;
-  font-weight: 500;
-  border: 1px solid rgba(187, 222, 251, 0.3);
-}
 
 /* MODAL - Fixed for mobile */
 .modal-overlay {
@@ -304,7 +236,7 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(0,0,0,0.5);
+  background: rgba(0,0,0,0.8);
   display: flex;
   justify-content: center;
   align-items: flex-start;
@@ -314,35 +246,35 @@
 }
 
 .modal-content {
-  background: white;
+  background: #1a1a1a;
   padding: 1.5rem;
-  border-radius: 12px;
+  border-radius: 8px;
   max-width: 400px;
   width: 100%;
   position: relative;
   max-height: 85vh;
   overflow-y: auto;
   margin-top: 1rem;
+  border: 1px solid #333;
 }
 
 .modal-close {
   position: sticky;
   top: 0;
   right: 0;
-  background: white;
+  background: #333;
   border: none;
   font-size: 1.2rem;
   cursor: pointer;
-  color: #666;
+  color: white;
   padding: 0.5rem;
   z-index: 10;
-  border-radius: 50%;
+  border-radius: 4px;
   width: 36px;
   height: 36px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
   margin-left: auto;
   margin-bottom: -20px;
 }
@@ -350,7 +282,7 @@
 .modal-tabs {
   display: flex;
   margin-bottom: 1.5rem;
-  border-bottom: 1px solid #eee;
+  border-bottom: 1px solid #333;
 }
 
 .tab-btn {
@@ -358,21 +290,21 @@
   padding: 0.8rem;
   background: none;
   border: none;
-  border-bottom: 3px solid transparent;
+  border-bottom: 2px solid transparent;
   font-size: 1rem;
-  color: #666;
+  color: #a1a1a1;
   cursor: pointer;
 }
 
 .tab-btn.active {
-  color: #1a237e;
-  border-bottom: 3px solid #4fc3f7;
-  font-weight: 600;
+  color: white;
+  border-bottom: 2px solid white;
+  font-weight: 500;
 }
 
 .modal-content h2 {
   margin: 0 0 1.5rem 0;
-  color: #333;
+  color: white;
   font-size: 1.5rem;
 }
 
@@ -391,14 +323,16 @@
 .form-group input {
   width: 100%;
   padding: 0.9rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background-color: #333;
+  border: 1px solid #444;
+  border-radius: 6px;
   font-size: 1rem;
+  color: white;
 }
 
 .form-group input:focus {
   outline: none;
-  border-color: #4fc3f7;
+  border-color: #666;
 }
 
 .forgot-password {
@@ -410,24 +344,23 @@
 .forgot-btn {
   background: none;
   border: none;
-  color: #4fc3f7;
+  color: #a1a1a1;
   font-size: 0.9rem;
   cursor: pointer;
   padding: 0.3rem 0.5rem;
-  text-decoration: underline;
 }
 
 .forgot-btn:hover {
-  color: #29b6f6;
+  color: white;
 }
 
 .submit-btn {
   width: 100%;
   padding: 1rem;
-  background: #1a237e;
-  color: white;
+  background: white;
+  color: black;
   border: none;
-  border-radius: 8px;
+  border-radius: 6px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -435,106 +368,187 @@
 }
 
 .submit-btn:hover {
-  background: #283593;
+  background-color: #f0f0f0;
 }
 
 .error-message {
-  background: #ffebee;
-  color: #c62828;
+  background: #331111;
+  color: #ff6b6b;
   padding: 0.8rem;
-  border-radius: 8px;
+  border-radius: 6px;
   margin-bottom: 1rem;
   display: flex;
   align-items: center;
   gap: 0.5rem;
   font-size: 0.9rem;
+  border: 1px solid #662222;
 }
 
-/* RESPONSIVE DESIGN */
+.footer {
+  background-color: #0a0a0a;
+  border-top: 1px solid #333;
+  padding: 2rem 0;
+  margin-top: 3rem;
+  width: 100%;
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2rem;
+}
+
+.footer-content p {
+  color: #ffffff;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.auth-status {
+  color: #ffffff;
+  font-size: 1.1rem;
+}
+
 @media (max-width: 768px) {
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+}
+
+
+/* Mobile Styles - Everything in hamburger */
+@media (max-width: 768px) {
+  .header {
+    padding: 0.5rem 0;
+  }
+  
   .header-container {
-    padding: 0 1.2rem;
+    padding: 0 1rem;
   }
   
-  .logo-link h1 {
-    font-size: 1.3rem;
+  /* Smaller logo on mobile */
+  .logo-text {
+    font-size: 20px !important;
   }
   
+  /* Hide desktop nav completely on mobile */
   .desktop-nav {
-    display: none;
+    display: none !important;
   }
   
+  /* Hamburger button styling */
   .hamburger {
     display: block;
+    font-size: 1.8rem;
+    padding: 0.3rem;
+    color: white;
+    background: none;
+    border: none;
+    cursor: pointer;
+    z-index: 1001;
   }
   
+  /* Mobile nav styling */
   .mobile-nav {
     display: flex;
+    flex-direction: column;
+    background-color: #0a0a0a;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out;
+    z-index: 1000;
+    border-bottom: 1px solid #1f1f1f;
   }
   
+  .mobile-nav.open {
+    max-height: 400px;
+  }
+  
+  /* Mobile nav links */
+  .mobile-nav a,
+  .mobile-nav button {
+    padding: 1rem 2rem;
+    color: #a1a1a1;
+    text-decoration: none;
+    font-size: 1.1rem;
+    border-top: 1px solid #1f1f1f;
+    background: none;
+    border-left: none;
+    border-right: none;
+    border-bottom: none;
+    text-align: left;
+    width: 100%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  
+  .mobile-nav a:hover,
+  .mobile-nav button:hover {
+    color: white;
+    background-color: #1a1a1a;
+  }
+  
+  /* Special styling for admin button in mobile */
+  .mobile-admin-btn {
+    background-color: #333 !important;
+    color: white !important;
+    font-weight: 500;
+  }
+  
+  /* Logout button styling */
+  .mobile-logout-btn {
+    color: #ff6b6b !important;
+  }
+  
+  .mobile-logout-btn:hover {
+    background-color: #331111 !important;
+  }
+  
+  /* Ensure content area adjusts */
   .content {
-    padding: 1.5rem 0;
+    padding: 1rem 0;
   }
   
   .content-wrapper {
-    padding: 0 1.2rem;
+    padding: 0 1rem;
   }
   
-  .footer-content {
-    padding: 0 1.2rem;
-  }
-  
-  .footer-links {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
-  
+  /* Modal adjustments for mobile */
   .modal-content {
-    padding: 1.2rem;
     width: 95%;
+    padding: 1rem;
+    margin-top: 2rem;
   }
 }
 
 @media (max-width: 480px) {
   .header-container {
-    padding: 0 1rem;
+    padding: 0 0.8rem;
   }
   
-  .logo-link h1 {
-    font-size: 1.1rem;
+  .logo-text {
+    font-size: 18px !important;
   }
   
-  .logo-icon {
-    font-size: 1.5rem;
+  .hamburger {
+    font-size: 1.6rem;
   }
   
-  .mobile-nav a, .mobile-login-btn, .mobile-admin-btn {
+  .mobile-nav a,
+  .mobile-nav button {
     padding: 0.9rem 1.5rem;
-  }
-  
-  .form-group input {
-    padding: 0.7rem;
-    font-size: 16px;
-  }
-  
-  .tab-btn {
-    padding: 0.7rem;
-  }
-}
-
-.logo-image {
-  max-width: 220px;  /* arba 100% */
-  height: auto;
-  transition: transform 0.3s ease;
-}
-
-.logo-image:hover {
-  transform: scale(1.05);
-}
-
-/* Responsive */
-@media (max-width: 768px) {
-  .logo-image {
-    max-width: 120px;
+    font-size: 1rem;
   }
 }

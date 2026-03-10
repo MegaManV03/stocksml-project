@@ -34,7 +34,7 @@ class Sector(Base):
     
     id = Column(Integer, primary_key=True)
     name = Column(String(255))
-    description = Column(Text)
+    description = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.now(timezone.utc))  # CHANGED: Add default
 
 
@@ -43,18 +43,18 @@ class Company(Base):
     
     id = Column(Integer, primary_key=True, autoincrement=True)
     sector_id = Column(Integer, ForeignKey('sectors.id'))
-    symbol = Column(String(10), nullable=False)
-    company_name = Column(String(100), nullable=False)
-    market_cap = Column(DECIMAL(15, 2))
-    pe_ratio = Column(DECIMAL(10, 2))
-    eps = Column(DECIMAL(10, 2))
-    revenue = Column(DECIMAL(15, 2))
-    profit_margin = Column(DECIMAL(5, 2))
-    debt_to_equity = Column(DECIMAL(10, 2))
-    next_earnings_date = Column(DATE)
-    earnings_estimate = Column(DECIMAL(10, 2))
-    dividend_yield = Column(DECIMAL(5, 2))
-    last_updated = Column(DateTime, default=datetime.now(timezone.utc))  # CHANGED: DATETIME → DateTime with default
+    symbol = Column(String(10))
+    company_name = Column(String(100))
+    market_cap = Column(DECIMAL(15, 2), nullable=True)
+    pe_ratio = Column(DECIMAL(10, 2), nullable=True)
+    eps = Column(DECIMAL(10, 2), nullable=True)
+    revenue = Column(DECIMAL(15, 2), nullable=True)
+    profit_margin = Column(DECIMAL(5, 2), nullable=True)
+    debt_to_equity = Column(DECIMAL(10, 2), nullable=True)
+    next_earnings_date = Column(DATE, nullable=True)
+    earnings_estimate = Column(DECIMAL(10, 2), nullable=True)
+    dividend_yield = Column(DECIMAL(5, 2), nullable=True)
+    last_updated = Column(DateTime, default=datetime.now(timezone.utc), nullable=True)
 
 
 class Analysis(Base):
@@ -85,7 +85,7 @@ class Stock_Prices(Base):
     id = Column(Integer, primary_key=True)
     company_id = Column(Integer, ForeignKey('companies.id'))
 
-    timestamp = Column(ENUM('1m', '5min', '15min', '30min', '1h', '5h', '1d'), name='timestamp')
+    timestamp = Column(ENUM('1m', '5m', '15m', '30m', '1h', '4h', '1d'), name='timestamp')
     date = Column(DateTime)
     open_price = Column(DECIMAL(10, 2))
     high_price = Column(DECIMAL(10, 2))
@@ -99,24 +99,14 @@ class Stock_Prices(Base):
 
 
 class Price_Predictions(Base):
-    __tablename__ = "predicted_stock_prices"
-
+    __tablename__ = "price_predictions"
+    
     id = Column(Integer, primary_key=True)
-    company_id = Column(Integer, ForeignKey('companies.id'))
-
-    timestamp = Column(ENUM('1m', '5min', '15min', '30min', '1h', '5h', '1d'), name='timestamp')
-    date = Column(DateTime)
-    open_price = Column(DECIMAL(10, 2))
-    high_price = Column(DECIMAL(10, 2))
-    close_price = Column(DECIMAL(10, 2))
-    low_price = Column(DECIMAL(10, 2))
-    volume = Column(BIGINT)
-
-    created_at = Column(DateTime, default=datetime.now(timezone.utc))
-
-    __table_args__ = (
-        Index('idx_pred_company_date', 'company_id', 'date'),
-    )
+    stock_price_id = Column(Integer, ForeignKey('stock_prices.id')) 
+    prediction_date = Column(DateTime, default=datetime.now(timezone.utc))  
+    long_probability = Column(DECIMAL(5, 4))  
+    short_probability = Column(DECIMAL(5, 4)) 
+    model_version = Column(String(50))  
 
 
 # Add the relationships after class definitions
@@ -126,7 +116,8 @@ Company.analyses = relationship("Analysis", back_populates="company")
 Analysis.company = relationship("Company", back_populates="analyses")
 
 Company.stock_prices = relationship("Stock_Prices", back_populates='company')
-Company.price_predictions = relationship("Price_Predictions", back_populates='company')
 
 Stock_Prices.company = relationship("Company", back_populates='stock_prices')
-Price_Predictions.company = relationship("Company", back_populates='price_predictions')
+Stock_Prices.predictions = relationship("Price_Predictions", back_populates='stock_price')
+
+Price_Predictions.stock_price = relationship("Stock_Prices", back_populates='predictions')  

@@ -4,6 +4,9 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from pathlib import Path
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
+from backend.ml_pipeline.scheduler_jobs import run_pipeline 
+
 
 # Optionally load `stocksml.env` in development if python-dotenv is installed.
 # We avoid hard-failing when dotenv is not available so you can run without it.
@@ -27,12 +30,16 @@ from backend.routers.companies import router as companies_router
 from backend.routers.analyses import router as analyses_router
 from backend.routers.users import router as users_router
 from backend.routers.auth import router as auth_router, get_password_hash
+from backend.routers.price_predictions import router as predictions_router
+from backend.routers.stock_prices import router as price_router
 from backend.models import Base, User
 from backend.database import SessionLocal, engine
 from fastapi import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from fastapi.responses import PlainTextResponse
 from contextlib import asynccontextmanager
+from sqlalchemy import text
+
 
 #creates an admin or makes existing user an admin
 def make_user_admin():
@@ -57,6 +64,8 @@ def make_user_admin():
         db.close()
 
 
+
+
 try:
     # Create database tables    
     Base.metadata.create_all(bind=engine)
@@ -65,9 +74,19 @@ except Exception as e:
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    #making user an admin on the startup
+    scheduler = BackgroundScheduler()
+    # Start scheduler
+    scheduler.add_job(run_pipeline, 'cron', minute='*/5', args=['5m'])  # Every 5 minutes
+    scheduler.add_job(run_pipeline, 'cron', minute='*/15', args=['15m'])
+    scheduler.add_job(run_pipeline, 'cron', minute='*/30', args=['30m'])  # Every 30 minutes
+    scheduler.add_job(run_pipeline, 'cron', hour='*', args=['1h'])  # Every hour at minute 0
+    scheduler.start()
+    
     make_user_admin()
     yield
+    
+    # Shutdown scheduler on app stop
+    scheduler.shutdown()
 
 app = FastAPI(lifespan=lifespan)
 
@@ -91,7 +110,8 @@ app.include_router(auth_router, prefix="/auth", tags=["auth"])
 app.include_router(users_router, prefix="/api/v1", tags=["users"])
 app.include_router(sectors_router, prefix="/sectors", tags=["sectors"])
 app.include_router(companies_router, prefix="/companies", tags=["companies"])
-app.include_router(analyses_router, prefix="/analyses", tags=["analyses"])
+app.include_router(predictions_router, prefix="/predictions", tags=["predictions"])
+
 
 # Serve frontend static files
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -110,7 +130,7 @@ if index_file and index_file.exists():
     @app.get("/{full_path:path}")
     async def spa_catch_all(full_path: str):
         # Prevent catching API routes
-        if full_path.startswith(("api", "auth", "sectors", "companies", "analyses")):
+        if full_path.startswith(("api", "auth", "sectors", "companies", "predictions")):
             raise HTTPException(status_code=404)
         return FileResponse(index_file)
 
@@ -119,7 +139,9 @@ if index_file and index_file.exists():
         # If a static file or route was not found, and the path isn't an API path,
         # return the SPA index so the frontend router can handle the route.
         path = request.url.path.lstrip("/")
-        api_prefixes = ("api", "auth", "sectors", "companies", "analyses")
+        api_prefixes = ("api", "auth", "sectors", "companies", "predictions")
         if exc.status_code == 404 and index_file and not path.startswith(api_prefixes):
             return FileResponse(index_file)
         return PlainTextResponse(str(exc.detail), status_code=exc.status_code)
+    
+

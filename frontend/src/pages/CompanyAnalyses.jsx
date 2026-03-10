@@ -1,12 +1,8 @@
 import { useEffect, useState } from 'react';
-import axios from 'axios';
-import { useParams, Link } from 'react-router-dom';
-import {
-  LineChart, Line, XAxis, YAxis, CartesianGrid, 
-  Tooltip, Legend, ResponsiveContainer
-} from 'recharts';
+import { useParams } from 'react-router-dom';
 import './CompanyAnalyses.css';
-import api from '../services/auth'; 
+import api from '../services/auth';
+import { createChart } from 'lightweight-charts';
 
 const API_URL = 'http://localhost:8000';
 
@@ -16,223 +12,228 @@ export default function CompanyAnalyses() {
   const [analyses, setAnalyses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
-  
+  const [timeframe, setTimeframe] = useState('15m');
+
+  useEffect(() => {
+    const fetchPredictions = async () => {
+      if (analyses.length === 0) return;
+      try {
+        const predictionsRes = await api.get(`/predictions/company/${companyId}`);
+        const predictionsMap = {};
+        predictionsRes.data.forEach(p => {
+          predictionsMap[p.stock_price_id] = p;
+        });
+        const enrichedData = analyses.map(analysis => ({
+          ...analysis,
+          predictions: predictionsMap[analysis.id] || null
+        }));
+        createChartWithData(enrichedData);
+      } catch (err) {
+        console.error('Error fetching predictions:', err);
+      }
+    };
+    fetchPredictions();
+  }, [analyses, companyId]);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('token');
-        if (!token) {
-          setError('Please login to view analyses');
-          setLoading(false);
-          return;
-        }
-        
-        const [companyRes, analysesRes] = await Promise.all([
+        ///
+        ///###if (!token) {
+        //  setError('Please login to view analyses');
+        //  setLoading(false);
+        //  return;
+        //}
+        ///
+        const [companyRes, stockPricesRes] = await Promise.all([
           api.get(`/companies/${companyId}`), 
-          api.get(`/sectors/${sectorId}/companies/${companyId}/analyses`) 
+          api.get(`/companies/${companyId}/stock-prices?timeframe=${timeframe}`)
         ]);
-        
         setCompany(companyRes.data);
-        setAnalyses(analysesRes.data);
+        setAnalyses(stockPricesRes.data);
       } catch (err) {
         setError(err.response?.data?.detail || 'Error loading data');
       } finally {
         setLoading(false);
       }
     };
-    
     fetchData();
-  }, [sectorId, companyId]);
-  
-  // Format for chart
-  const chartData = analyses.map(a => ({
-    date: new Date(a.date).toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric' 
-    }),
-    actual: a.close_price,
-    predicted: a.predicted_close,
-    signal: a.signal,
-    color: a.signal === 'BUY' ? '#10b981' : a.signal === 'SELL' ? '#ef4444' : '#f59e0b'
-  }));
-  
-  // Custom tooltip
-  const CustomTooltip = ({ active, payload, label }) => {
-    if (active && payload && payload.length) {
-      const data = payload[0].payload;
-      return (
-        <div className="custom-tooltip" style={{
-          background: 'white',
-          padding: '12px',
-          border: '1px solid #e0e0e0',
-          borderRadius: '8px',
-          boxShadow: '0 4px 12px rgba(0,0,0,0.1)'
-        }}>
-          <p style={{ margin: '0 0 8px 0', fontWeight: '600', color: '#1a237e' }}>
-            {label}
-          </p>
-          <div style={{ display: 'grid', gap: '6px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#666' }}>Actual:</span>
-              <span style={{ fontWeight: '600', color: '#0066cc' }}>
-                ${data.actual?.toFixed(2)}
-              </span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              <span style={{ color: '#666' }}>Predicted:</span>
-              <span style={{ fontWeight: '600', color: '#ff6600' }}>
-                ${data.predicted?.toFixed(2)}
-              </span>
-            </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <span style={{ color: '#666' }}>Signal:</span>
-              <span style={{
-                padding: '3px 8px',
-                borderRadius: '12px',
-                fontSize: '0.8rem',
-                fontWeight: '600',
-                color: 'white',
-                background: data.color
-              }}>
-                {data.signal}
-              </span>
-            </div>
-          </div>
-        </div>
+  }, [sectorId, companyId, timeframe]);
+
+  const createChartWithData = (data) => {
+    const chartContainer = document.getElementById('candlestick-chart');
+    if (!chartContainer) return;
+    chartContainer.innerHTML = '';
+    
+    // In createChartWithData function, update the chart options:
+    const getChartHeight = () => {
+      if (window.innerWidth <= 480) return 250;
+      if (window.innerWidth <= 768) return 300;
+      return 500;
+    };
+
+    const chart = createChart(chartContainer, {
+      width: chartContainer.clientWidth,
+      height: getChartHeight(),
+      layout: {
+        backgroundColor: '#ffffff',
+        textColor: '#333',
+      },
+      grid: {
+        vertLines: { color: '#f0f0f0' },
+        horzLines: { color: '#f0f0f0' },
+      },
+      timeScale: {
+        timeVisible: true,
+        tickMarkFormatter: (time) => {
+          const date = new Date(time * 1000);
+          return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        },
+        fixLeftEdge: true,
+        fixRightEdge: true,
+        lockVisibleTimeRangeOnResize: true,
+        rightBarStaysOnScroll: true,
+        borderVisible: true,
+        borderColor: '#d1d5db',
+        visible: true,
+        secondsVisible: false,
+        shiftVisibleRangeOnNewBar: true,
+        allowShiftVisibleRangeOnWhitespaceReplacement: true,
+      },
+    });
+
+    const longSeries = chart.addLineSeries({
+      color: '#10b981',
+      lineWidth: 1.5,
+      priceScaleId: 'left',
+      lineStyle: 2,
+      lineVisible: true,
+      crosshairMarkerVisible: false,
+    });
+
+    const shortSeries = chart.addLineSeries({
+      color: '#ef4444',
+      lineWidth: 1.5,
+      priceScaleId: 'left',
+      lineStyle: 2,
+      lineVisible: true,
+      crosshairMarkerVisible: false,
+    });
+
+    chart.priceScale('left').applyOptions({
+      visible: false,
+      scaleMargins: { top: 0.2, bottom: 0.2 },
+    });
+
+    const candlestickSeries = chart.addCandlestickSeries({
+      upColor: '#10b981',
+      downColor: '#ef4444',
+      borderVisible: false,
+      wickUpColor: '#10b981',
+      wickDownColor: '#ef4444',
+    });
+
+    const chartData = data
+      .map(item => ({
+        time: new Date(item.date).getTime() / 1000,
+        open: item.open_price,
+        high: item.high_price,
+        low: item.low_price,
+        close: item.close_price,
+      }))
+      .filter((item, index, self) => 
+        index === self.findIndex(t => t.time === item.time)
+      )
+      .sort((a, b) => a.time - b.time);
+
+    candlestickSeries.setData(chartData);
+
+    const longData = data
+      .filter(item => item.predictions?.long_probability)
+      .map(item => ({
+        time: new Date(item.date).getTime() / 1000,
+        value: item.predictions.long_probability * 100,
+      }))
+      .sort((a, b) => a.time - b.time);
+
+    const shortData = data
+      .filter(item => item.predictions?.short_probability)
+      .map(item => ({
+        time: new Date(item.date).getTime() / 1000,
+        value: item.predictions.short_probability * 100,
+      }))
+      .sort((a, b) => a.time - b.time);
+
+    if (longData.length > 0) longSeries.setData(longData);
+    if (shortData.length > 0) shortSeries.setData(shortData);
+
+    chartContainer.style.position = 'relative';
+
+    const probabilityDisplay = document.createElement('div');
+    probabilityDisplay.style = 'position: absolute; top: 10px; right: 10px; background: white; padding: 6px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); z-index: 1000; display: none; color: black;';
+    chartContainer.appendChild(probabilityDisplay);
+
+    chart.subscribeCrosshairMove(param => {
+      if (!param.time) {
+        probabilityDisplay.style.display = 'none';
+        return;
+      }
+      const dataPoint = data.find(item => 
+        Math.floor(new Date(item.date).getTime() / 1000) === param.time
       );
-    }
-    return null;
+      if (dataPoint?.predictions) {
+        probabilityDisplay.style.display = 'block';
+        probabilityDisplay.innerHTML = `
+          <span style="color: #10b981; margin-right: 10px;">L: ${(dataPoint.predictions.long_probability * 100).toFixed(1)}%</span>
+          <span style="color: #ef4444;">S: ${(dataPoint.predictions.short_probability * 100).toFixed(1)}%</span>
+        `;
+      } else {
+        probabilityDisplay.style.display = 'none';
+      }
+    });
+
+    const handleResize = () => {
+      const newHeight = getChartHeight();
+      chart.applyOptions({ 
+        width: chartContainer.clientWidth,
+        height: newHeight 
+      });
+    };
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      chart.remove();
+    };
   };
-  
+
   if (loading) return <div className="loading">Loading analyses...</div>;
   if (error) return <div className="error">Error: {error}</div>;
-  
+
   return (
     <div className="company-analyses-container">
-      
-      {/* Header */}
-      <div className="header-section">
-        <Link to={`/sectors/${sectorId}/companies`} className="back-link">
-          ← Back to Companies
-        </Link>
-        <h1>{company?.symbol}</h1>
-        <p className="company-name">{company?.company_name}</p>
+      <div className="controls">
+        <h1 className="company-ticker">{company?.symbol}</h1>
+        <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+          <select className="timeframe-select" value={timeframe} onChange={(e) => setTimeframe(e.target.value)}>
+            <option value="5m">5m</option>
+            <option value="15m">15m</option>
+            <option value="30m">30m</option>
+            <option value="1h">1h</option>
+          </select>
+          <span className="live-text">
+          <span className="dot"></span>
+          Live data with yfinance and predictions with transformer
+        </span>
+        </div>
       </div>
-      
-      {/* Chart */}
+
       {analyses.length > 0 && (
-        <div className="chart-container">
-          <h2>Price Analysis Chart</h2>
-          <div className="chart-wrapper">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart 
-                data={chartData}
-                margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
-              >
-                <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                <XAxis 
-                  dataKey="date" 
-                  tick={{ fill: '#666' }}
-                  axisLine={{ stroke: '#e0e0e0' }}
-                />
-                <YAxis 
-                  tickFormatter={v => `$${v}`}
-                  tick={{ fill: '#666' }}
-                  axisLine={{ stroke: '#e0e0e0' }}
-                />
-                <Tooltip content={<CustomTooltip />} />
-                <Legend 
-                  verticalAlign="top" 
-                  height={36}
-                  iconType="circle"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="actual" 
-                  stroke="#0066cc" 
-                  strokeWidth={3}
-                  dot={{ r: 5, fill: '#0066cc' }}
-                  activeDot={{ r: 8, stroke: '#0066cc', strokeWidth: 2, fill: 'white' }}
-                  name="Actual Price"
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="predicted" 
-                  stroke="#ff6600" 
-                  strokeWidth={2.5}
-                  strokeDasharray="5 5"
-                  dot={{ r: 4, fill: '#ff6600' }}
-                  activeDot={{ r: 7, stroke: '#ff6600', strokeWidth: 2, fill: 'white' }}
-                  name="Predicted Price"
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
+        <div className="chart-wrapper">
+          <div id="candlestick-chart" />
         </div>
       )}
-      
-      {/* Analyses List */}
-      <div className="analyses-section">
-        <h2>Analyses ({analyses.length})</h2>
-        {analyses.length === 0 ? (
-          <p className="no-analyses">No analyses available for this company yet</p>
-        ) : (
-          <div className="analyses-grid">
-            {analyses.map((a, i) => (
-              <div 
-                key={i} 
-                className={`analysis-card ${a.signal.toLowerCase()}`}
-              >
-                <div className="analysis-header">
-                  <div>
-                    <strong>
-                      {new Date(a.date).toLocaleDateString('en-US', {
-                        weekday: 'short',
-                        year: 'numeric',
-                        month: 'short',
-                        day: 'numeric'
-                      })}
-                    </strong>
-                    <span className={`signal-badge ${a.signal.toLowerCase()}`}>
-                      {a.signal}
-                    </span>
-                  </div>
-                  <div className="confidence">
-                    Confidence: <strong>{a.confidence_score}%</strong>
-                  </div>
-                </div>
-                
-                <div className="analysis-details">
-                  <div className="detail-item">
-                    <span>Open:</span>
-                    <strong>${a.open_price?.toFixed(2)}</strong>
-                  </div>
-                  <div className="detail-item">
-                    <span>Close:</span>
-                    <strong>${a.close_price?.toFixed(2)}</strong>
-                  </div>
-                  <div className="detail-item">
-                    <span>High:</span>
-                    <strong>${a.high_price?.toFixed(2)}</strong>
-                  </div>
-                  <div className="detail-item">
-                    <span>Low:</span>
-                    <strong>${a.low_price?.toFixed(2)}</strong>
-                  </div>
-                  <div className="detail-item">
-                    <span>Predicted Close:</span>
-                    <strong>${a.predicted_close?.toFixed(2)}</strong>
-                  </div>
-                  <div className="detail-item">
-                    <span>Volume:</span>
-                    <strong>{(a.volume / 1000000).toFixed(1)}M</strong>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
     </div>
   );
 }

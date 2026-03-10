@@ -96,6 +96,19 @@ const Layout = ({ children }) => {
       if (refreshTimer) clearTimeout(refreshTimer);
       refreshTimer = setupAutoRefresh();
     };
+
+    // Listens for localStorage changes from other tabs and logs out user when token is removed
+    window.addEventListener('storage', (event) => {
+      // Ignore if this tab triggered the event
+      if (event.storageArea === localStorage && 
+          event.key === TOKEN_KEY && 
+          event.newValue === null) {
+        // Only logout if it's a different tab
+        if (!event.isTrusted) return; // or use a custom flag
+        clearAuthTokens();
+        window.location.href = '/';
+      }
+    });
     
     window.addEventListener('storage', handleStorageChange);
     
@@ -206,40 +219,48 @@ const Layout = ({ children }) => {
         <div className="header-container">
           <div className="logo">
             <Link to="/" className="logo-link">
-              <img 
-                src={logo}
-                alt="Stock Analysis Logo" 
-                className="logo-image"
-              />
+              <span className="logo-text">Kristupas Velžys Project</span>
             </Link>
-          </div>
+          </div>  
           
           {/* Desktop Navigation */}
           <nav className="desktop-nav">
             <Link to="/" onClick={() => setIsMenuOpen(false)}>
-              <FontAwesomeIcon icon={faHome} /> Home
+               Home
             </Link>
             
             {/* Show Control Panel only for admin */}
             {authState.isLoggedIn && authState.role === 'admin' && (
               <Link to="/controlPanel" onClick={() => setIsMenuOpen(false)} className="admin-btn">
-                <FontAwesomeIcon icon={faChartLine} /> Control Panel
+                Control Panel
               </Link>
             )}
             
-            {authState.isLoggedIn ? (
-              <div className="user-info">
-                <Link to="/account" className="user-btn" title="My Account">
-                  <FontAwesomeIcon icon={faUser} /> 
-                  <span className="username">{authState.username}</span>
-                </Link>
-                
+            {!authState.isLoggedIn ? (
+            <>
+              <span style={{ color: '#a1a1a1', fontSize: '24px', fontWeight: '300', marginRight: '0.5rem' }}>|</span>
+              <div style={{ display: 'flex', gap: '0.25rem', alignItems: 'center' }}>
+                <button className="login-btn" onClick={() => {
+                  setIsRegisterMode(false);
+                  openModal();
+                }}>
+                  Login
+                </button>
+                <button className="signup-btn" onClick={() => {
+                  setIsRegisterMode(true);
+                  openModal();
+                }}>
+                  Sign Up
+                </button>
               </div>
-            ) : (
-              <button className="login-btn" onClick={openModal}>
-                <FontAwesomeIcon icon={faUser} /> Login
-              </button>
-            )}
+            </>
+          ) : (
+            <div className="user-info">
+              <Link to="/account" className="user-btn" title="My Account">
+                <span className="username">{authState.username}</span>
+              </Link>
+            </div>
+          )}
           </nav>
 
           {/* Hamburger Mobile Button */}
@@ -251,32 +272,45 @@ const Layout = ({ children }) => {
         {/* Mobile Navigation */}
         <nav className={`mobile-nav ${isMenuOpen ? 'open' : ''}`}>
           <Link to="/" onClick={() => setIsMenuOpen(false)}>
-            <FontAwesomeIcon icon={faHome} /> Home
+             Home
           </Link>
           
           {/* Show Control Panel only for admin */}
           {authState.isLoggedIn && authState.role === 'admin' && (
             <Link to="/controlPanel" onClick={() => setIsMenuOpen(false)} className="mobile-admin-btn">
-              <FontAwesomeIcon icon={faChartLine} /> Control Panel
+              Control Panel
             </Link>
           )}
           
           {authState.isLoggedIn ? (
             <>
               <Link to="/account" className="mobile-login-btn" onClick={() => setIsMenuOpen(false)}>
-                <FontAwesomeIcon icon={faUser} /> My Account
+                My Account
               </Link>
               <button onClick={() => {
                 handleLogout();
                 setIsMenuOpen(false);
               }} className="mobile-logout-btn">
-                <FontAwesomeIcon icon={faSignOutAlt} /> Logout
+                Logout
               </button>
             </>
           ) : (
-            <button className="mobile-login-btn" onClick={openModal}>
-              <FontAwesomeIcon icon={faUser} /> Login
-            </button>
+            <>
+              <button className="mobile-login-btn" onClick={() => {
+                  setIsRegisterMode(false);
+                  openModal();
+                  setIsMenuOpen(false);
+                }}>
+                  Login
+                </button>
+                <button className="mobile-signup-btn" onClick={() => {
+                  setIsRegisterMode(true);
+                  openModal();
+                  setIsMenuOpen(false);
+                }}>
+                  Sign Up
+              </button>
+            </>
           )}
         </nav>
       </header>
@@ -289,21 +323,16 @@ const Layout = ({ children }) => {
       </main>
 
       {/* FOOTER */}
-      <footer className="footer">
-        <div className="footer-content">
-          <p>© 2025 Stock Analysis Platform | React + FastAPI</p>
-          <div className="footer-links">
-            <a href="http://localhost:8000/docs" target="_blank" rel="noopener noreferrer">
-              API Docs (Swagger)
-            </a>
-            <span className="auth-status">
-              Status: {authState.isLoggedIn ? 
-                `Logged in as ${authState.username} (${authState.role})` : 
-                'Guest mode'}
-            </span>
-          </div>
-        </div>
-      </footer>
+    <footer className="footer">
+      <div className="footer-content" style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '2rem', flexWrap: 'wrap' }}>
+        <p style={{ margin: 0, color: '#ffffff', fontSize: '1.1rem' }}>© 2025 Stock Analysis Platform | Made by Kristupas</p>
+        <span className="auth-status" style={{ color: '#ffffff', fontSize: '1.1rem' }}>
+          Status: {authState.isLoggedIn ? 
+            `Logged in as ${authState.username} (${authState.role})` : 
+            'Guest mode'}
+        </span>
+      </div>
+    </footer>
 
       {/* LOGIN/REGISTER MODAL */}
       {isModalOpen && (

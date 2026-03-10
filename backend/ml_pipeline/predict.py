@@ -248,8 +248,7 @@ def process_predictions(timestamp: str, company_ids: Union[int, List[int]],
                 except Exception as e:
                     print(f"Error processing row {idx} for company {company_id}: {e}")
                     continue
-            else:
-                print(f"Skipping row at index {idx} (insufficient prior data)")
+            
         
         conn.commit()
         total_predictions += company_predictions

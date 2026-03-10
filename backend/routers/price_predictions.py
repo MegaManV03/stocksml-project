@@ -40,4 +40,3 @@ async def get_predictions_by_company(
         .filter(Stock_Prices.company_id == company_id)\
         .all()
     return predictions
-

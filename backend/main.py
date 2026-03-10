@@ -21,9 +21,6 @@ env_path = ROOT / "stocksml.env"
 if env_path.exists() and load_dotenv:
     load_dotenv(env_path)
 
-ADMIN_USERNAME = os.getenv("ADMIN_USERNAME", "kri")
-ADMIN_PASSWORD = os.getenv("ADMIN_USERNAME", "kri")
-ADMIN_EMAIL = os.getenv("ADMIN_EMAIL", "kri@mail.com")
 
 from backend.routers.sectors import router as sectors_router
 from backend.routers.companies import router as companies_router
@@ -41,27 +38,7 @@ from contextlib import asynccontextmanager
 from sqlalchemy import text
 
 
-#creates an admin or makes existing user an admin
-def make_user_admin():
-    db = SessionLocal()
-    try:
-        user = db.query(User).filter(User.username == ADMIN_USERNAME).first()
-        if user:
-            user.role = "admin"
-            db.commit()
-            print(f"Made {user.username} an admin!")
-        else:
-            admin_user = User(
-                username=ADMIN_USERNAME,
-                email=ADMIN_EMAIL, 
-                hashed_password=get_password_hash(ADMIN_PASSWORD),
-                role="admin"
-            )
-            db.add(admin_user)
-            db.commit()
-            print("Created admin user!")
-    finally:
-        db.close()
+
 
 
 
@@ -82,7 +59,6 @@ async def lifespan(app: FastAPI):
     scheduler.add_job(run_pipeline, 'cron', hour='*', args=['1h'])  # Every hour at minute 0
     scheduler.start()
     
-    make_user_admin()
     yield
     
     # Shutdown scheduler on app stop

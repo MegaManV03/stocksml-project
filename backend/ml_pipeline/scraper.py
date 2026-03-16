@@ -120,7 +120,7 @@ def download_stock_data(interval, sector_tickers_dict):
                 if df.empty:
                     print(f"No data returned for {ticker} {interval} from {startDate} to {endDate}")
                     continue
-                print(df.head())
+                #print(df.head())
                 
                 for index, row in df.iterrows():
                     if index.to_pydatetime().replace(tzinfo=None) > existing_data:

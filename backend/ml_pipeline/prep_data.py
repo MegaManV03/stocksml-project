@@ -94,7 +94,7 @@ if __name__ == "__main__":
     df['date'] = pd.to_datetime(df['date'])
     df['timestamp'] = pd.Categorical(df['timestamp'])
 
-    companiesId = 40 # from 1 to 40
+    companiesId = 2 # from 1 to 40
     timestamp = '5m'
 
     all_peaks = []

@@ -228,7 +228,9 @@ const Layout = ({ children }) => {
             <Link to="/" onClick={() => setIsMenuOpen(false)}>
                Home
             </Link>
-            
+            <Link to="/about" onClick={() => setIsMenuOpen(false)}>
+              About
+            </Link>
             {/* Show Control Panel only for admin */}
             {authState.isLoggedIn && authState.role === 'admin' && (
               <Link to="/controlPanel" onClick={() => setIsMenuOpen(false)} className="admin-btn">
@@ -271,8 +273,8 @@ const Layout = ({ children }) => {
 
         {/* Mobile Navigation */}
         <nav className={`mobile-nav ${isMenuOpen ? 'open' : ''}`}>
-          <Link to="/" onClick={() => setIsMenuOpen(false)}>
-             Home
+          <Link to="/about" onClick={() => setIsMenuOpen(false)}>
+             About
           </Link>
           
           {/* Show Control Panel only for admin */}

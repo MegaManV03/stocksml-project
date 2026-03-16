@@ -10,6 +10,7 @@ import Profile from './pages/Profile';
 import SectorCompanies from './pages/SectorCompanies';
 import CompanyAnalyses from './pages/CompanyAnalyses';
 import Account from './pages/Account';
+import About from './pages/About'
 import AdminDashboard from './components/AdminDashboard';
 import UsersManagement from './components/UsersManagement';
 import CompaniesManagement from './components/CompaniesManagement';
@@ -81,6 +82,7 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<Home />} />
+          <Route path='/about' element={<About />} />
           <Route path="/sectors" element={<Sectors />} />
           <Route path="/companies" element={<Companies />} />
           <Route path="/analyses" element={<Analyses />} />
